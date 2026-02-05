@@ -9,6 +9,9 @@
 #include "telnet.h"
 #include "rtcsupport.h"
 #include "../displays/tools/l10n.h"
+#ifdef DSP_LCD
+#include "../displays/animations.h"
+#endif
 #ifdef USE_SD
 #include "sdmanager.h"
 #endif
@@ -426,6 +429,17 @@ void Config::setScreensaverPlayingBlank(bool val){
   display.putRequest(NEWMODE, PLAYER);
 #endif
 }
+
+void Config::setLcdAnimationType(uint8_t val) {
+  if(val > 3) val = 0;  // Validate range 0-3
+  saveValue(&store.lcdAnimationType, val);
+  #ifdef DSP_LCD
+    if(display.mode() == SCREENSAVER) {
+      dsp.initScreensaver((AnimationType)val);
+    }
+  #endif
+}
+
 void Config::setSntpOne(const char *val){
   bool tzdone = false;
   if (strlen(val) > 0 && strlen(store.sntp2) > 0) {
@@ -601,6 +615,7 @@ void Config::setDefaults() {
   store.screensaverEnabled = false;
   store.screensaverTimeout = 20;
   store.screensaverBlank = false;
+  store.lcdAnimationType = 0;  // Default to FISH animation
   snprintf(store.mdnsname, MDNS_LENGTH, "yoradio-%x", (unsigned int)getChipId());
   store.skipPlaylistUpDown = false;
   store.screensaverPlayingEnabled = false;

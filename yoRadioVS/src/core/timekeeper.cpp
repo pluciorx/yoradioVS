@@ -189,8 +189,9 @@ void TimeKeeper::_upClock(){
 }
 
 void TimeKeeper::_upScreensaver(){
-#ifndef DSP_LCD
   if(!display.ready()) return;
+  
+  // Support both graphical and LCD displays
   if(config.store.screensaverEnabled && display.mode()==PLAYER && !player.isRunning()){
     config.screensaverTicks++;
     if(config.screensaverTicks > config.store.screensaverTimeout+SCREENSAVERSTARTUPDELAY){
@@ -213,7 +214,6 @@ void TimeKeeper::_upScreensaver(){
       config.screensaverPlayingTicks=SCREENSAVERSTARTUPDELAY;
     }
   }
-#endif
 }
 
 void TimeKeeper::_upRSSI(){

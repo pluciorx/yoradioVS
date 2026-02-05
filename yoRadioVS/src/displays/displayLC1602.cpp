@@ -9,6 +9,64 @@
   #define SCREEN_ADDRESS 0x27 ///< See datasheet for Address or scan it https://create.arduino.cc/projecthub/abdularbi17/how-to-scan-i2c-address-in-arduino-eaadda
 #endif
 
+// Static instance of animation controller
+static LCDAnimationController lcdAnimController;
+
+// LCDAnimationController implementation
+LCDAnimationController::LCDAnimationController() {
+  _currentFrame = 0;
+  _totalFrames = 0;
+  _lastUpdate = 0;
+  _frameDuration = 0;
+  _currentAnimation = ANIM_FISH;
+  _animData = nullptr;
+}
+
+void LCDAnimationController::begin(AnimationType type) {
+  _currentAnimation = type;
+  _currentFrame = 0;
+  _lastUpdate = millis();
+  
+  // Select appropriate animation based on display width
+  #if DSP_MODEL==DSP_4002I2C
+    // 40x2 display
+    for(const auto& anim : animations40) {
+      if(anim.type == type) {
+        _animData = &anim;
+        _totalFrames = anim.frameCount;
+        _frameDuration = anim.frameDuration;
+        break;
+      }
+    }
+  #else
+    // 20x2 or 16x2 displays
+    for(const auto& anim : animations) {
+      if(anim.type == type) {
+        _animData = &anim;
+        _totalFrames = anim.frameCount;
+        _frameDuration = anim.frameDuration;
+        break;
+      }
+    }
+  #endif
+}
+
+bool LCDAnimationController::needsUpdate() {
+  return (millis() - _lastUpdate >= _frameDuration);
+}
+
+void LCDAnimationController::update() {
+  if(needsUpdate() && _animData != nullptr) {
+    _currentFrame = (_currentFrame + 1) % _totalFrames;
+    _lastUpdate = millis();
+  }
+}
+
+const AnimFrame* LCDAnimationController::getCurrentFrame() {
+  if(_animData == nullptr || _animData->frames == nullptr) return nullptr;
+  return &(_animData->frames[_currentFrame]);
+}
+
 DspCore::DspCore(): DSP_INIT {}
 
 void DspCore::apScreen() {
@@ -84,6 +142,32 @@ void DspCore::wake(void) {
 #ifdef LCD_I2C
   backlight();
 #endif
+}
+
+// Animation methods for screensaver
+void DspCore::showAnimationFrame(const AnimFrame* frame) {
+  if(frame == nullptr) return;
+  
+  clear();
+  setCursor(0, 0);
+  print(frame->line1);
+  setCursor(0, 1);
+  print(frame->line2);
+}
+
+void DspCore::initScreensaver(AnimationType type) {
+  lcdAnimController.begin(type);
+  // Show first frame immediately
+  const AnimFrame* frame = lcdAnimController.getCurrentFrame();
+  showAnimationFrame(frame);
+}
+
+void DspCore::updateScreensaver() {
+  lcdAnimController.update();
+  if(lcdAnimController.needsUpdate()) {
+    const AnimFrame* frame = lcdAnimController.getCurrentFrame();
+    showAnimationFrame(frame);
+  }
 }
 
 #endif

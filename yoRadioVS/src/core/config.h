@@ -125,6 +125,7 @@ struct config_t
   bool      screensaverPlayingEnabled;
   uint16_t  screensaverPlayingTimeout;
   bool      screensaverPlayingBlank;
+  uint8_t   lcdAnimationType;     // 0=FISH, 1=STARS, 2=WAVES, 3=CLOCK_ONLY
   char      mdnsname[24];
   bool      skipPlaylistUpDown;
   uint16_t  abuff;
@@ -243,6 +244,7 @@ class Config {
     void setScreensaverPlayingEnabled(bool val);
     void setScreensaverPlayingTimeout(uint16_t val);
     void setScreensaverPlayingBlank(bool val);
+    void setLcdAnimationType(uint8_t val);
     void setSntpOne(const char *val);
     void setShowweather(bool val);
     void setWeatherKey(const char *val);

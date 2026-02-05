@@ -13,6 +13,9 @@
 #include "../displays/widgets/widgets.h"
 #include "../displays/widgets/pages.h"
 #include "../displays/tools/l10n.h"
+#ifdef DSP_LCD
+#include "../displays/animations.h"
+#endif
 
 Display display;
 #ifdef USE_NEXTION
@@ -354,12 +357,24 @@ void Display::_swichMode(displayMode_e newmode) {
   }
   if (newmode == SCREENSAVER || newmode == SCREENBLANK) {
     config.isScreensaver = true;
-    _pager->setPage( pages[PG_SCREENSAVER]);
-    if (newmode == SCREENBLANK) {
-      //dsp.clearClock();
-      _clock->clear();
-      config.setDspOn(false, false);
-    }
+    
+    #ifdef DSP_LCD
+      if (newmode == SCREENSAVER) {
+        // Initialize LCD animation from config
+        dsp.initScreensaver((AnimationType)config.store.lcdAnimationType);
+      } else {
+        // SCREENBLANK - just clear display
+        dsp.clearDsp(true);
+        config.setDspOn(false, false);
+      }
+    #else
+      _pager->setPage( pages[PG_SCREENSAVER]);
+      if (newmode == SCREENBLANK) {
+        //dsp.clearClock();
+        _clock->clear();
+        config.setDspOn(false, false);
+      }
+    #endif
   }else{
     config.screensaverTicks=SCREENSAVERSTARTUPDELAY;
     config.screensaverPlayingTicks=SCREENSAVERSTARTUPDELAY;
@@ -538,6 +553,12 @@ void Display::loop() {
           return;
       }
   }
+
+  #ifdef DSP_LCD
+    if(_mode == SCREENSAVER) {
+      dsp.updateScreensaver();
+    }
+  #endif
 
   dsp.loop();
 /*
