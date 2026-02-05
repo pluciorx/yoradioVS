@@ -163,8 +163,8 @@ void DspCore::initScreensaver(AnimationType type) {
 }
 
 void DspCore::updateScreensaver() {
-  lcdAnimController.update();
   if(lcdAnimController.needsUpdate()) {
+    lcdAnimController.update();
     const AnimFrame* frame = lcdAnimController.getCurrentFrame();
     showAnimationFrame(frame);
   }
