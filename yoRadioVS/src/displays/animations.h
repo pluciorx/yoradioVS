@@ -123,7 +123,7 @@ const AnimFrame clockAnimation40[] = {
 };
 
 // Animation configuration
-enum AnimationType {
+enum AnimationType : uint8_t {
 	ANIM_FISH,
 	ANIM_STARS,
 	ANIM_WAVES,
