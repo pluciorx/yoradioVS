@@ -9,9 +9,7 @@
 #include "telnet.h"
 #include "rtcsupport.h"
 #include "../displays/tools/l10n.h"
-#ifdef DSP_LCD
 #include "../displays/animations.h"
-#endif
 #ifdef USE_SD
 #include "sdmanager.h"
 #endif
