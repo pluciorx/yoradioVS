@@ -630,17 +630,21 @@ void Display::_time(bool redraw) {
 }
 
 void Display::_volume() {
-  if(_volbar) _volbar->setValue(config.store.volume);
-  #ifndef HIDE_VOL
-    if(_voltxt) _voltxt->setText(config.store.volume, voltxtFmt);
-  #endif
-  if(_mode==VOL) {
-    timekeeper.waitAndReturnPlayer(3);
-    _nums->setText(config.store.volume, numtxtFmt);
-  }
-  /*#ifdef USE_NEXTION
-    nextion.setVol(config.store.volume, _mode == VOL);
-  #endif*/
+    uint8_t vol = config.store.volume;
+#ifdef VOL_PCT
+    vol = (vol * 100) / 254;
+#endif
+    if (_volbar) _volbar->setValue(config.store.volume);
+#ifndef HIDE_VOL
+    if (_voltxt) _voltxt->setText(vol, voltxtFmt);
+#endif
+    if (_mode == VOL) {
+        timekeeper.waitAndReturnPlayer(3);
+        _nums->setText(vol, numtxtFmt);
+    }
+    /*#ifdef USE_NEXTION
+      nextion.setVol(config.store.volume, _mode == VOL);
+    #endif*/
 }
 
 void Display::flip(){ dsp.flip(); }

@@ -371,6 +371,7 @@ template <class T> int Config::eepromWrite(int ee, const T& value) {
   for (i = 0; i < sizeof(value); i++)
     EEPROM.write(ee++, *p++);
   EEPROM.commit();
+  
   return i;
 }
 
