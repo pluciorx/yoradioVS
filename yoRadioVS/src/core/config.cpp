@@ -431,7 +431,7 @@ void Config::setScreensaverPlayingBlank(bool val){
 }
 
 void Config::setLcdAnimationType(uint8_t val) {
-  if(val > 3) val = 0;  // Validate range 0-3
+  if(val >= ANIM_TYPE_COUNT) val = 0;  // Validate range
   saveValue(&store.lcdAnimationType, val);
   #ifdef DSP_LCD
     if(display.mode() == SCREENSAVER) {

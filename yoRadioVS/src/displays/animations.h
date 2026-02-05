@@ -109,6 +109,8 @@ const AnimFrame waveAnimation40[] = {
 };
 
 // Bouncing clock animation for 40x2 (positions for time display)
+// Note: HH:MM:SS and DD/MM/YYYY are placeholder strings that should be
+// replaced with actual time/date values at runtime when this animation type is used
 const AnimFrame clockAnimation40[] = {
   {"            HH:MM:SS                    ", "          DD/MM/YYYY                    "},
   {"               HH:MM:SS                 ", "             DD/MM/YYYY                 "},
@@ -125,7 +127,8 @@ enum AnimationType {
 	ANIM_FISH,
 	ANIM_STARS,
 	ANIM_WAVES,
-	ANIM_CLOCK_ONLY  // Keep existing clock behavior
+	ANIM_CLOCK_ONLY,  // Keep existing clock behavior
+	ANIM_TYPE_COUNT   // Number of animation types
 };
 
 struct Animation {

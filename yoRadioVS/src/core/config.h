@@ -125,7 +125,7 @@ struct config_t
   bool      screensaverPlayingEnabled;
   uint16_t  screensaverPlayingTimeout;
   bool      screensaverPlayingBlank;
-  uint8_t   lcdAnimationType;     // 0=FISH, 1=STARS, 2=WAVES, 3=CLOCK_ONLY
+  uint8_t   lcdAnimationType;     // 0=FISH, 1=STARS, 2=WAVES, 3=CLOCK_ONLY (validated against ANIM_TYPE_COUNT)
   char      mdnsname[24];
   bool      skipPlaylistUpDown;
   uint16_t  abuff;
