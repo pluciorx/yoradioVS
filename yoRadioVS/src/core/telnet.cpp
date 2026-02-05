@@ -245,6 +245,65 @@ void Telnet::on_input(const char* str, uint8_t clientId) {
       player.stepVol(true);
       return;
     }
+
+    // Query screensaver enabled status
+    if (strcmp(str, "cli.screensaver") == 0 || strcmp(str, "screensaver") == 0) {
+        printf(clientId, "##CLI.SCREENSAVER#: %s\n> ", config.store.screensaverEnabled ? "enabled" : "disabled");
+        return;
+    }
+
+    // Query screensaver timeout
+    if (strcmp(str, "cli.screensaver.timeout") == 0 || strcmp(str, "screensaver.timeout") == 0) {
+        printf(clientId, "##CLI.SCREENSAVER.TIMEOUT#: %d seconds\n> ", config.store.screensaverTimeout);
+        return;
+    }
+
+    // Query screensaver blank mode
+    if (strcmp(str, "cli.screensaver.blank") == 0 || strcmp(str, "screensaver.blank") == 0) {
+        printf(clientId, "##CLI.SCREENSAVER.BLANK#: %s\n> ", config.store.screensaverBlank ? "enabled" : "disabled");
+        return;
+    }
+
+    // Query screensaver playing enabled
+    if (strcmp(str, "cli.screensaver.playing") == 0 || strcmp(str, "screensaver.playing") == 0) {
+        printf(clientId, "##CLI.SCREENSAVER.PLAYING#: %s\n> ", config.store.screensaverPlayingEnabled ? "enabled" : "disabled");
+        return;
+    }
+
+    // Query screensaver playing timeout
+    if (strcmp(str, "cli.screensaver.playing.timeout") == 0 || strcmp(str, "screensaver.playing.timeout") == 0) {
+        printf(clientId, "##CLI.SCREENSAVER.PLAYING.TIMEOUT#: %d minutes\n> ", config.store.screensaverPlayingTimeout);
+        return;
+    }
+
+    // Query screensaver playing blank
+    if (strcmp(str, "cli.screensaver.playing.blank") == 0 || strcmp(str, "screensaver.playing.blank") == 0) {
+        printf(clientId, "##CLI.SCREENSAVER.PLAYING.BLANK#: %s\n> ", config.store.screensaverPlayingBlank ? "enabled" : "disabled");
+        return;
+    }
+	// Query screensaver animation type
+    if (strcmp(str, "cli.screensaver.lcdAnimationType") == 0 || strcmp(str, "screensaver.lcdAnimationType") == 0) {
+        printf(clientId, "##CLI.SCREENSAVER.LCDANIMATIONTYPE#: %s\n> ", config.store.lcdAnimationType );
+        return;
+    }
+    // Query all screensaver settings at once
+    if (strcmp(str, "cli.screensaver.info") == 0 || strcmp(str, "screensaver.info") == 0) {
+        printf(clientId, "##CLI.SCREENSAVER.INFO#\n");
+        printf(clientId, "Screensaver Enabled: %s\n", config.store.screensaverEnabled ? "yes" : "no");
+        printf(clientId, "Timeout: %d seconds\n", config.store.screensaverTimeout);
+        printf(clientId, "Blank Screen: %s\n", config.store.screensaverBlank ? "yes" : "no");
+        printf(clientId, "Playing Mode Enabled: %s\n", config.store.screensaverPlayingEnabled ? "yes" : "no");
+        printf(clientId, "Playing Timeout: %d minutes\n", config.store.screensaverPlayingTimeout);
+        printf(clientId, "Playing Blank Screen: %s\n> ", config.store.screensaverPlayingBlank ? "yes" : "no");
+        return;
+    }
+    if (strcmp(str, "cli.lcdanimation") == 0 || strcmp(str, "lcdanimation") == 0) {
+        const char* animNames[] = { "FISH", "STARS", "WAVES", "CLOCK_ONLY" };
+        printf(clientId, "##CLI.LCDANIMATION#: %s (%d)\n> ",
+            animNames[config.store.lcdAnimationType], config.store.lcdAnimationType);
+        return;
+    }
+
     if (strcmp(str, "sys.date") == 0 || strcmp(str, "date") == 0 || strcmp(str, "time") == 0) {
       network.requestTimeSync(true, clientId > MAX_TLN_CLIENTS?clientId:0);
       return;

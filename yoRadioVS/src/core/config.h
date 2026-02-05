@@ -124,8 +124,7 @@ struct config_t
   bool      screensaverBlank;
   bool      screensaverPlayingEnabled;
   uint16_t  screensaverPlayingTimeout;
-  bool      screensaverPlayingBlank;
-  uint8_t   lcdAnimationType;     // 0=FISH, 1=STARS, 2=WAVES, 3=CLOCK_ONLY (validated against ANIM_TYPE_COUNT)
+  bool      screensaverPlayingBlank; 
   char      mdnsname[24];
   bool      skipPlaylistUpDown;
   uint16_t  abuff;
@@ -134,6 +133,7 @@ struct config_t
   uint16_t  timeSyncInterval;
   uint16_t  timeSyncIntervalRTC;
   uint16_t  weatherSyncInterval;
+  uint8_t   lcdAnimationType;     // 0=FISH, 1=STARS, 2=WAVES, 3=CLOCK_ONLY (validated against ANIM_TYPE_COUNT)
 };
 
 #if IR_PIN!=255

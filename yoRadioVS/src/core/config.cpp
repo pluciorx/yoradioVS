@@ -10,6 +10,7 @@
 #include "rtcsupport.h"
 #include "../displays/tools/l10n.h"
 #include "../displays/animations.h"
+
 #ifdef USE_SD
 #include "sdmanager.h"
 #endif
@@ -132,7 +133,11 @@ void Config::_setupVersion(){
       saveValue(&store.watchdog, true);
       saveValue(&store.timeSyncInterval, (uint16_t)60);    //min
       saveValue(&store.timeSyncIntervalRTC, (uint16_t)24); //hours
-      saveValue(&store.weatherSyncInterval, (uint16_t)30); // min
+      saveValue(&store.weatherSyncInterval, (uint16_t)30); // min	
+      break;
+    case 5:  
+      saveValue(&store.lcdAnimationType, (uint8_t)0);  // Default to FISH animation
+      break;
     default:
       break;
   }
@@ -429,13 +434,8 @@ void Config::setScreensaverPlayingBlank(bool val){
 }
 
 void Config::setLcdAnimationType(uint8_t val) {
-  if(val >= ANIM_TYPE_COUNT) val = 0;  // Validate range
-  saveValue(&store.lcdAnimationType, val);
-  #ifdef DSP_LCD
-    if(display.mode() == SCREENSAVER) {
-      dsp.initScreensaver((AnimationType)val);
-    }
-  #endif
+    if (val > 3) val = 0;  // Validate: 0-3 only
+    saveValue(&store.lcdAnimationType, val);
 }
 
 void Config::setSntpOne(const char *val){
@@ -625,6 +625,7 @@ void Config::setDefaults() {
   store.timeSyncInterval = 60;    //min
   store.timeSyncIntervalRTC = 24; //hour
   store.weatherSyncInterval = 30; //min
+  store.lcdAnimationType = 0;  // ADD THIS: Default to ANIM_FISH
   eepromWrite(EEPROM_START, store);
 }
 
