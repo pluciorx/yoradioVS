@@ -474,7 +474,8 @@ void Display::loop() {
         case NEWMODE: _swichMode((displayMode_e)request.payload); break;
         case CLOSEPLAYLIST: player.sendCommand({PR_PLAY, request.payload}); break;
         case CLOCK: 
-          if(_mode==PLAYER || _mode==SCREENSAVER) _time(request.payload==1); 
+          //if(_mode==PLAYER || (_mode==SCREENSAVER) _time(request.payload==1); 
+            if (_mode == PLAYER ) _time(request.payload == 1);
           /*#ifdef USE_NEXTION
             if(_mode==TIMEZONE) nextion.localTime(network.timeinfo);
             if(_mode==INFO)     nextion.rssi();

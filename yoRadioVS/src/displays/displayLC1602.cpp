@@ -3,6 +3,7 @@
 #include "dspcore.h"
 #include <WiFi.h>
 #include "../core/config.h"
+#include "../core/network.h"
 #include "animations.h"
 
 #ifndef SCREEN_ADDRESS
@@ -146,28 +147,57 @@ void DspCore::wake(void) {
 
 // Animation methods for screensaver
 void DspCore::showAnimationFrame(const AnimFrame* frame) {
-  if(frame == nullptr) return;
-  
-  clear();
-  setCursor(0, 0);
-  print(frame->line1);
-  setCursor(0, 1);
-  print(frame->line2);
+    if (frame == nullptr) return;
+
+    char line1[41];
+    char line2[41];
+    strcpy(line1, frame->line1);
+    strcpy(line2, frame->line2);
+
+    // Replace time placeholder
+    char timeBuf[9];
+    strftime(timeBuf, sizeof(timeBuf), "%H:%M:%S", &network.timeinfo);
+    char* pos = strstr(line1, "HH:MM:SS");
+    if (pos) {
+        memcpy(pos, timeBuf, 8);
+    }
+    pos = strstr(line2, "HH:MM:SS");
+    if (pos) {
+        memcpy(pos, timeBuf, 8);
+    }
+
+    // Replace date placeholder
+    char dateBuf[11];
+    strftime(dateBuf, sizeof(dateBuf), "%d/%m/%Y", &network.timeinfo);
+    pos = strstr(line1, "DD/MM/YYYY");
+    if (pos) {
+        memcpy(pos, dateBuf, 10);
+    }
+    pos = strstr(line2, "DD/MM/YYYY");
+    if (pos) {
+        memcpy(pos, dateBuf, 10);
+    }
+
+    clear();
+    setCursor(0, 0);
+    print(line1);
+    setCursor(0, 1);
+    print(line2);
 }
 
 void DspCore::initScreensaver(AnimationType type) {
-  lcdAnimController.begin(type);
-  // Show first frame immediately
-  const AnimFrame* frame = lcdAnimController.getCurrentFrame();
-  showAnimationFrame(frame);
+    lcdAnimController.begin(type);
+    // Show first frame immediately
+    const AnimFrame* frame = lcdAnimController.getCurrentFrame();
+    showAnimationFrame(frame);
 }
 
 void DspCore::updateScreensaver() {
-  if(lcdAnimController.needsUpdate()) {
-    lcdAnimController.update();
-    const AnimFrame* frame = lcdAnimController.getCurrentFrame();
-    showAnimationFrame(frame);
-  }
+    if (lcdAnimController.needsUpdate()) {
+        lcdAnimController.update();
+        const AnimFrame* frame = lcdAnimController.getCurrentFrame();
+        showAnimationFrame(frame);
+    }
 }
 
 #endif

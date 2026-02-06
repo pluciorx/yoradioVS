@@ -45,6 +45,28 @@ const AnimFrame waveAnimation[] = {
   {"     ~~~~~~~~~~~~~~~~", "~~~~~               "},
 };
 
+// Bouncing ball animation for 20x2
+const AnimFrame ballAnimation[] = {
+  {"         o          ", "                    "},
+  {"        o           ", "                    "},
+  {"       o            ", "                    "},
+  {"      o             ", "                    "},
+  {"     o              ", "                    "},
+  {"    o               ", "                    "},
+  {"   o                ", "                    "},
+  {"  o                 ", "                    "},
+  {" o                  ", "                    "},
+  {"o                   ", "                    "},
+  {" o                  ", "                    "},
+  {"  o                 ", "                    "},
+  {"   o                ", "                    "},
+  {"    o               ", "                    "},
+  {"     o              ", "                    "},
+  {"      o             ", "                    "},
+  {"       o            ", "                    "},
+  {"        o           ", "                    "},
+};
+
 // Fish animation for 40x2
 const AnimFrame fishAnimation40[] = {
   {">'>                                    ", "                                    >'>"},
@@ -83,7 +105,7 @@ const AnimFrame fishAnimation40[] = {
   {"                                 >'>   ", "   >'>"},
   {"                                  >'>  ", "  >'>"},
   {"                                   >'> ", " >'>"},
-  {"                                    >'>", ">'>"}
+  {"                                    >'>", ">'>" }
 };
 
 // Star animation for 40x2
@@ -91,7 +113,7 @@ const AnimFrame starAnimation40[] = {
   {"*    .    *    .    *    .    *    .  ", ".    *    .    *    .    *    .    *   "},
   {" *    .    *    .    *    .    *    . ", "  .    *    .    *    .    *    .    * "},
   {"  *    .    *    .    *    .    *    .", "   .    *    .    *    .    *    .    *"},
-  {"   *    .    *    .    *    .    *    ", "    .    *    .    *    .    *    .    "}
+  {"   *    .    *    .    *    .    *    ", "    .   *    .    *    .    *    .    "}
 };
 
 // Wave animation for 40x2
@@ -106,6 +128,48 @@ const AnimFrame waveAnimation40[] = {
   {"       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", "~~~~~~~                                 "},
   {"        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", "~~~~~~~~                                "},
   {"         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", "~~~~~~~~~                               "}
+};
+
+// Bouncing ball animation for 40x2
+const AnimFrame ballAnimation40[] = {
+  {"                   o                    ", "                                        "},
+  {"                  o                     ", "                                        "},
+  {"                 o                      ", "                                        "},
+  {"                o                       ", "                                        "},
+  {"               o                        ", "                                        "},
+  {"              o                         ", "                                        "},
+  {"             o                          ", "                                        "},
+  {"            o                           ", "                                        "},
+  {"           o                            ", "                                        "},
+  {"          o                             ", "                                        "},
+  {"         o                              ", "                                        "},
+  {"        o                               ", "                                        "},
+  {"       o                                ", "                                        "},
+  {"      o                                 ", "                                        "},
+  {"     o                                  ", "                                        "},
+  {"    o                                   ", "                                        "},
+  {"   o                                    ", "                                        "},
+  {"  o                                     ", "                                        "},
+  {" o                                      ", "                                        "},
+  {"o                                       ", "                                        "},
+  {" o                                      ", "                                        "},
+  {"  o                                     ", "                                        "},
+  {"   o                                    ", "                                        "},
+  {"    o                                   ", "                                        "},
+  {"     o                                  ", "                                        "},
+  {"      o                                 ", "                                        "},
+  {"       o                                ", "                                        "},
+  {"        o                               ", "                                        "},
+  {"         o                              ", "                                        "},
+  {"          o                             ", "                                        "},
+  {"           o                            ", "                                        "},
+  {"            o                           ", "                                        "},
+  {"             o                          ", "                                        "},
+  {"              o                         ", "                                        "},
+  {"               o                        ", "                                        "},
+  {"                o                       ", "                                        "},
+  {"                 o                      ", "                                        "},
+  {"                  o                     ", "                                        "},
 };
 
 // Bouncing clock animation for 40x2 (positions for time display)
@@ -127,6 +191,7 @@ enum AnimationType : uint8_t {
 	ANIM_FISH,
 	ANIM_STARS,
 	ANIM_WAVES,
+	ANIM_BALL,
 	ANIM_CLOCK_ONLY,  // Keep existing clock behavior
 	ANIM_TYPE_COUNT   // Number of animation types
 };
@@ -143,6 +208,7 @@ const Animation animations[] = {
   {fishAnimation, sizeof(fishAnimation) / sizeof(AnimFrame), 150, ANIM_FISH},
   {starAnimation, sizeof(starAnimation) / sizeof(AnimFrame), 300, ANIM_STARS},
   {waveAnimation, sizeof(waveAnimation) / sizeof(AnimFrame), 200, ANIM_WAVES},
+  {ballAnimation, sizeof(ballAnimation) / sizeof(AnimFrame), 100, ANIM_BALL},
   {nullptr, 0, 0, ANIM_CLOCK_ONLY}
 };
 
@@ -151,6 +217,7 @@ const Animation animations40[] = {
   {fishAnimation40, sizeof(fishAnimation40) / sizeof(AnimFrame), 150, ANIM_FISH},
   {starAnimation40, sizeof(starAnimation40) / sizeof(AnimFrame), 300, ANIM_STARS},
   {waveAnimation40, sizeof(waveAnimation40) / sizeof(AnimFrame), 200, ANIM_WAVES},
+  {ballAnimation40, sizeof(ballAnimation40) / sizeof(AnimFrame), 100, ANIM_BALL},
   {clockAnimation40, sizeof(clockAnimation40) / sizeof(AnimFrame), 1000, ANIM_CLOCK_ONLY}
 };
 
