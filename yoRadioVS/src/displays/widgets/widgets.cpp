@@ -461,6 +461,9 @@ void VuWidget::_clear(){ }
    SOUND METER WIDGET
  ************************/
 #if !defined(DSP_LCD) && !defined(DSP_OLED)
+
+#define SOUNDMETER_FADE_RATE 2
+
 SoundMeterWidget::~SoundMeterWidget() {
   if(_canvas) free(_canvas);
 }
@@ -488,12 +491,12 @@ void SoundMeterWidget::_draw(){
   
   if(played){
     // When playing, follow the level immediately up, fade down slowly
-    _measL = (L >= _measL) ? L : (_measL > 2 ? _measL - 2 : 0);
-    _measR = (R >= _measR) ? R : (_measR > 2 ? _measR - 2 : 0);
+    _measL = (L >= _measL) ? L : (_measL > SOUNDMETER_FADE_RATE ? _measL - SOUNDMETER_FADE_RATE : 0);
+    _measR = (R >= _measR) ? R : (_measR > SOUNDMETER_FADE_RATE ? _measR - SOUNDMETER_FADE_RATE : 0);
   } else {
     // When not playing, fade to zero
-    if(_measL > 0) _measL = (_measL > 2) ? _measL - 2 : 0;
-    if(_measR > 0) _measR = (_measR > 2) ? _measR - 2 : 0;
+    if(_measL > 0) _measL = (_measL > SOUNDMETER_FADE_RATE) ? _measL - SOUNDMETER_FADE_RATE : 0;
+    if(_measR > 0) _measR = (_measR > SOUNDMETER_FADE_RATE) ? _measR - SOUNDMETER_FADE_RATE : 0;
   }
   if(_measL > halfWidth) _measL = halfWidth;
   if(_measR > halfWidth) _measR = halfWidth;
