@@ -458,6 +458,82 @@ void VuWidget::_clear(){ }
 #endif
 
 /************************
+   SOUND METER WIDGET
+ ************************/
+#if !defined(DSP_LCD) && !defined(DSP_OLED)
+SoundMeterWidget::~SoundMeterWidget() {
+  if(_canvas) free(_canvas);
+}
+
+void SoundMeterWidget::init(WidgetConfig wconf, uint16_t width, uint16_t height, uint16_t barcolor, uint16_t bgcolor) {
+  Widget::init(wconf, bgcolor, bgcolor);
+  _barcolor = barcolor;
+  _smwidth = width;
+  _smheight = height;
+  _canvas = new Canvas(_smwidth, _smheight);
+}
+
+void SoundMeterWidget::_draw(){
+  if(!_active || _locked) return;
+  
+  static uint16_t measL, measR;
+  uint16_t vulevel = player.get_VUlevel(_smwidth / 2);
+  
+  uint8_t L = (vulevel >> 8) & 0xFF;
+  uint8_t R = vulevel & 0xFF;
+  
+  bool played = player.isRunning();
+  uint16_t halfWidth = _smwidth / 2;
+  
+  if(played){
+    measL = (L >= measL) ? measL + 1 : L;
+    measR = (R >= measR) ? measR + 1 : R;
+  } else {
+    if(measL < halfWidth) measL += 1;
+    if(measR < halfWidth) measR += 1;
+  }
+  if(measL > halfWidth) measL = halfWidth;
+  if(measR > halfWidth) measR = halfWidth;
+  
+  // Clear canvas
+  _canvas->fillRect(0, 0, _smwidth, _smheight, _bgcolor);
+  
+  // Draw bars from edges toward middle
+  // Left channel: bars from left edge (0) moving right
+  for(uint16_t i = 0; i < measL; i++) {
+    _canvas->drawFastVLine(i, 0, _smheight, _barcolor);
+  }
+  
+  // Right channel: bars from right edge moving left
+  for(uint16_t i = 0; i < measR; i++) {
+    _canvas->drawFastVLine(_smwidth - 1 - i, 0, _smheight, _barcolor);
+  }
+  
+  // Draw to display
+  dsp.startWrite();
+  dsp.setAddrWindow(_config.left, _config.top, _smwidth, _smheight);
+  dsp.writePixels((uint16_t*)_canvas->getBuffer(), _smwidth * _smheight);
+  dsp.endWrite();
+}
+
+void SoundMeterWidget::loop(){
+  if(_active && !_locked) _draw();
+}
+
+void SoundMeterWidget::_clear(){
+  dsp.fillRect(_config.left, _config.top, _smwidth, _smheight, _bgcolor);
+}
+#else // DSP_LCD or DSP_OLED
+SoundMeterWidget::~SoundMeterWidget() { }
+void SoundMeterWidget::init(WidgetConfig wconf, uint16_t width, uint16_t height, uint16_t barcolor, uint16_t bgcolor) {
+  Widget::init(wconf, bgcolor, bgcolor);
+}
+void SoundMeterWidget::_draw(){ }
+void SoundMeterWidget::loop(){ }
+void SoundMeterWidget::_clear(){ }
+#endif
+
+/************************
       NUM & CLOCK
  ************************/
 #if !defined(DSP_LCD)
