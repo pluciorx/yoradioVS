@@ -243,11 +243,21 @@ void Display::_buildPager(){
   #if !defined(DSP_LCD) && !defined(DSP_OLED)
     WidgetConfig smConf;
     smConf.left = TFT_FRAMEWDT;
-    smConf.top = clockConf.top + 40; // Position below clock
+    // Position the sound meter based on screen height - place it in the lower portion
+    // Typically TIME_SIZE*CHARHEIGHT is the clock height, add some spacing
+    #if TIME_SIZE >= 35  // For larger displays with big clocks
+      smConf.top = clockConf.top + TIME_SIZE + 10;
+      uint16_t smHeight = 12;
+    #elif TIME_SIZE >= 19 // Medium size clocks
+      smConf.top = clockConf.top + TIME_SIZE + 8;
+      uint16_t smHeight = 10;
+    #else  // Smaller displays
+      smConf.top = clockConf.top + TIME_SIZE + 5;
+      uint16_t smHeight = 8;
+    #endif
     smConf.textsize = 0;
     smConf.align = WA_CENTER;
     uint16_t smWidth = dsp.width() - TFT_FRAMEWDT * 2;
-    uint16_t smHeight = 10; // Height of the sound meter bars
     _soundmeter->init(smConf, smWidth, smHeight, config.theme.clock, config.theme.background);
     pages[PG_SCREENSAVER]->addWidget(_soundmeter);
   #endif

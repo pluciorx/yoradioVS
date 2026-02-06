@@ -477,20 +477,20 @@ void SoundMeterWidget::_draw(){
   if(!_active || _locked) return;
   
   static uint16_t measL, measR;
-  uint16_t vulevel = player.get_VUlevel(_smwidth / 2);
+  uint16_t halfWidth = _smwidth / 2;
+  uint16_t vulevel = player.get_VUlevel(halfWidth);
   
   uint8_t L = (vulevel >> 8) & 0xFF;
   uint8_t R = vulevel & 0xFF;
   
   bool played = player.isRunning();
-  uint16_t halfWidth = _smwidth / 2;
   
   if(played){
-    measL = (L >= measL) ? measL + 1 : L;
-    measR = (R >= measR) ? measR + 1 : R;
+    measL = (L >= measL) ? L : measL + 2; // Fade down slowly when level drops
+    measR = (R >= measR) ? R : measR + 2;
   } else {
-    if(measL < halfWidth) measL += 1;
-    if(measR < halfWidth) measR += 1;
+    if(measL < halfWidth) measL += 2;
+    if(measR < halfWidth) measR += 2;
   }
   if(measL > halfWidth) measL = halfWidth;
   if(measR > halfWidth) measR = halfWidth;
