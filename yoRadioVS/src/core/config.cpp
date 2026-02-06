@@ -9,6 +9,8 @@
 #include "telnet.h"
 #include "rtcsupport.h"
 #include "../displays/tools/l10n.h"
+#include "../displays/animations.h"
+
 #ifdef USE_SD
 #include "sdmanager.h"
 #endif
@@ -131,7 +133,11 @@ void Config::_setupVersion(){
       saveValue(&store.watchdog, true);
       saveValue(&store.timeSyncInterval, (uint16_t)60);    //min
       saveValue(&store.timeSyncIntervalRTC, (uint16_t)24); //hours
-      saveValue(&store.weatherSyncInterval, (uint16_t)30); // min
+      saveValue(&store.weatherSyncInterval, (uint16_t)30); // min	
+      break;
+    case 5:  
+      saveValue(&store.lcdAnimationType, (uint8_t)0);  // Default to FISH animation
+      break;
     default:
       break;
   }
@@ -426,6 +432,12 @@ void Config::setScreensaverPlayingBlank(bool val){
   display.putRequest(NEWMODE, PLAYER);
 #endif
 }
+
+void Config::setLcdAnimationType(uint8_t val) {
+    
+    saveValue(&store.lcdAnimationType, val);
+}
+
 void Config::setSntpOne(const char *val){
   bool tzdone = false;
   if (strlen(val) > 0 && strlen(store.sntp2) > 0) {
@@ -601,6 +613,7 @@ void Config::setDefaults() {
   store.screensaverEnabled = false;
   store.screensaverTimeout = 20;
   store.screensaverBlank = false;
+  store.lcdAnimationType = 0;  // Default to FISH animation
   snprintf(store.mdnsname, MDNS_LENGTH, "yoradio-%x", (unsigned int)getChipId());
   store.skipPlaylistUpDown = false;
   store.screensaverPlayingEnabled = false;
@@ -612,6 +625,7 @@ void Config::setDefaults() {
   store.timeSyncInterval = 60;    //min
   store.timeSyncIntervalRTC = 24; //hour
   store.weatherSyncInterval = 30; //min
+  store.lcdAnimationType = 0;  // ADD THIS: Default to ANIM_FISH
   eepromWrite(EEPROM_START, store);
 }
 

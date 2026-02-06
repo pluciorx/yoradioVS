@@ -31,6 +31,7 @@
     <None Include="data\www\theme.css" />
     <None Include="data\www\updform.html.gz" />
     <None Include="YoRadioVS.slnx" />
+    <None Include=".github\copilot-instructions.md" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="YoRadioVS.ino" />
@@ -530,6 +531,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\yoEncoder\yoEncoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\displays\tools\utf8Pol.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1179,10 +1183,16 @@
     <ClInclude Include="myoptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\yoradio\YoRadioVS\src\displays\animations.h">
+    <ClInclude Include="src\displays\animations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\displays\animations.h">
+    <ClInclude Include="locale\displayL10n_pl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="locale\namedays_PL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\displays\tools\polishChars.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

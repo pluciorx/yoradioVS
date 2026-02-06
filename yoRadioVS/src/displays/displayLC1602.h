@@ -42,6 +42,26 @@ typedef LiquidCrystal yoDisplay;
 #endif
 
 #include "tools/commongfx.h"
+#include "animations.h"
+
+// LCD Animation Controller for screensaver
+class LCDAnimationController {
+private:
+  uint8_t _currentFrame;
+  uint8_t _totalFrames;
+  uint32_t _lastUpdate;
+  uint16_t _frameDuration;
+  AnimationType _currentAnimation;
+  const Animation* _animData;
+  
+public:
+  LCDAnimationController();
+  void begin(AnimationType type);
+  void update();
+  bool needsUpdate();
+  const AnimFrame* getCurrentFrame();
+  uint8_t getCurrentFrameIndex() { return _currentFrame; }
+};
 
 #ifdef LCD_2004
 #if __has_include("conf/displayLCD2004conf_custom.h")

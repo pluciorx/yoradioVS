@@ -2,7 +2,7 @@
 #include "../../core/options.h"
 #include "../dspcore.h"
 #include "utf8Rus.h"
-
+#if L10N_LANGUAGE == RU
 size_t strlen_utf8(const char* s) {
   size_t count = 0;
   while (*s) {
@@ -107,3 +107,5 @@ char* utf8Rus(const char* str, bool uppercase) {
   return out;
 }
 
+
+#endif //#if L10N_LANGUAGE == RU

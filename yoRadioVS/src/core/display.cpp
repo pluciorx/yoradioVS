@@ -13,6 +13,9 @@
 #include "../displays/widgets/widgets.h"
 #include "../displays/widgets/pages.h"
 #include "../displays/tools/l10n.h"
+#ifdef DSP_LCD
+#include "../displays/animations.h"
+#endif
 
 Display display;
 #ifdef USE_NEXTION
@@ -210,8 +213,11 @@ void Display::_buildPager(){
   if(_heapbar)  _footer->addWidget( _heapbar);
   
   if(_metabackground) pages[PG_PLAYER]->addWidget( _metabackground);
+
   pages[PG_PLAYER]->addWidget(_meta);
   pages[PG_PLAYER]->addWidget(_title1);
+
+
   if(_title2) pages[PG_PLAYER]->addWidget(_title2);
   if(_weather) pages[PG_PLAYER]->addWidget(_weather);
   #if BITRATE_FULL
@@ -354,12 +360,24 @@ void Display::_swichMode(displayMode_e newmode) {
   }
   if (newmode == SCREENSAVER || newmode == SCREENBLANK) {
     config.isScreensaver = true;
-    _pager->setPage( pages[PG_SCREENSAVER]);
-    if (newmode == SCREENBLANK) {
-      //dsp.clearClock();
-      _clock->clear();
-      config.setDspOn(false, false);
-    }
+    
+    #ifdef DSP_LCD
+      if (newmode == SCREENSAVER) {
+        // Initialize LCD animation from config
+        dsp.initScreensaver((AnimationType)config.store.lcdAnimationType);
+      } else {
+        // SCREENBLANK - just clear display
+        dsp.clearDsp(true);
+        config.setDspOn(false, false);
+      }
+    #else
+      _pager->setPage( pages[PG_SCREENSAVER]);
+      if (newmode == SCREENBLANK) {
+        //dsp.clearClock();
+        _clock->clear();
+        config.setDspOn(false, false);
+      }
+    #endif
   }else{
     config.screensaverTicks=SCREENSAVERSTARTUPDELAY;
     config.screensaverPlayingTicks=SCREENSAVERSTARTUPDELAY;
@@ -446,7 +464,8 @@ void Display::loop() {
     return;
   }
   if(displayQueue==NULL || _locked) return;
-  _pager->loop();
+  if(!(_mode == SCREENSAVER ))  _pager->loop();
+
 #ifdef USE_NEXTION
   nextion.loop();
 #endif
@@ -459,13 +478,22 @@ void Display::loop() {
         case NEWMODE: _swichMode((displayMode_e)request.payload); break;
         case CLOSEPLAYLIST: player.sendCommand({PR_PLAY, request.payload}); break;
         case CLOCK: 
-          if(_mode==PLAYER || _mode==SCREENSAVER) _time(request.payload==1); 
+          //if(_mode==PLAYER || (_mode==SCREENSAVER) _time(request.payload==1); 
+            if (_mode == PLAYER) _time(request.payload == 1);
+#ifdef DSP_LCD
+            if (_mode == SCREENSAVER) _clock->updateTime();
+#endif
           /*#ifdef USE_NEXTION
             if(_mode==TIMEZONE) nextion.localTime(network.timeinfo);
             if(_mode==INFO)     nextion.rssi();
           #endif*/
           break;
-        case NEWTITLE: _title(); break;
+        case NEWTITLE: {
+            if (_mode != SCREENSAVER) {
+                _title();
+            }
+        }break;
+        
         case NEWSTATION: _station(); break;
         case NEXTSTATION: _drawNextStationNum(request.payload); break;
         case DRAWPLAYLIST: _drawPlaylist(); break;
@@ -538,6 +566,12 @@ void Display::loop() {
           return;
       }
   }
+
+  #ifdef DSP_LCD
+    if(_mode == SCREENSAVER) {
+      dsp.updateScreensaver();
+    }
+  #endif
 
   dsp.loop();
 /*

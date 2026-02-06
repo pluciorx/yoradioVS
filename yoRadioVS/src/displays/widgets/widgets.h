@@ -210,6 +210,7 @@ class ClockWidget: public Widget {
     void clear(){ _clearClock(); }
     inline uint16_t dateSize(){ return _space+ _dateheight; }
     inline uint16_t clockWidth(){ return _clockwidth; }
+    void updateTime();
   private:
   #ifndef DSP_LCD
     Adafruit_GFX &getRealDsp();

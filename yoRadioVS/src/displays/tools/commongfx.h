@@ -3,6 +3,12 @@
 #include "../widgets/widgetsconfig.h" // displayXXXDDDDconf.h
 #include "utf8Rus.h"
 
+// Forward declarations for LCD animations
+#ifdef DSP_LCD
+enum AnimationType : uint8_t;
+struct AnimFrame;
+#endif
+
 typedef struct clipArea {
   uint16_t left; 
   uint16_t top; 
@@ -55,6 +61,10 @@ class DspCore: public yoDisplay {
       void apScreen();
       void drawLogo(uint16_t top){}
       void loop(bool force=false){}
+      // Screensaver animation methods
+      void initScreensaver(AnimationType type);
+      void updateScreensaver();
+      void showAnimationFrame(const AnimFrame* frame);
     #endif
     void flip();
     void invert();
