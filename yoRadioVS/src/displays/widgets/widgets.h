@@ -184,8 +184,10 @@ class SoundMeterWidget: public Widget {
     #endif
     uint16_t _barcolor;
     uint16_t _smwidth, _smheight;
+    uint16_t _measL, _measR;
     void _draw();
     void _clear();
+    void _reset();
 };
 
 class NumWidget: public TextWidget {

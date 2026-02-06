@@ -470,13 +470,14 @@ void SoundMeterWidget::init(WidgetConfig wconf, uint16_t width, uint16_t height,
   _barcolor = barcolor;
   _smwidth = width;
   _smheight = height;
+  _measL = 0;
+  _measR = 0;
   _canvas = new Canvas(_smwidth, _smheight);
 }
 
 void SoundMeterWidget::_draw(){
   if(!_active || _locked) return;
   
-  static uint16_t measL, measR;
   uint16_t halfWidth = _smwidth / 2;
   uint16_t vulevel = player.get_VUlevel(halfWidth);
   
@@ -486,26 +487,28 @@ void SoundMeterWidget::_draw(){
   bool played = player.isRunning();
   
   if(played){
-    measL = (L >= measL) ? L : measL + 2; // Fade down slowly when level drops
-    measR = (R >= measR) ? R : measR + 2;
+    // When playing, follow the level immediately up, fade down slowly
+    _measL = (L >= _measL) ? L : (_measL > 2 ? _measL - 2 : 0);
+    _measR = (R >= _measR) ? R : (_measR > 2 ? _measR - 2 : 0);
   } else {
-    if(measL < halfWidth) measL += 2;
-    if(measR < halfWidth) measR += 2;
+    // When not playing, fade to zero
+    if(_measL > 0) _measL = (_measL > 2) ? _measL - 2 : 0;
+    if(_measR > 0) _measR = (_measR > 2) ? _measR - 2 : 0;
   }
-  if(measL > halfWidth) measL = halfWidth;
-  if(measR > halfWidth) measR = halfWidth;
+  if(_measL > halfWidth) _measL = halfWidth;
+  if(_measR > halfWidth) _measR = halfWidth;
   
   // Clear canvas
   _canvas->fillRect(0, 0, _smwidth, _smheight, _bgcolor);
   
   // Draw bars from edges toward middle
   // Left channel: bars from left edge (0) moving right
-  for(uint16_t i = 0; i < measL; i++) {
+  for(uint16_t i = 0; i < _measL; i++) {
     _canvas->drawFastVLine(i, 0, _smheight, _barcolor);
   }
   
   // Right channel: bars from right edge moving left
-  for(uint16_t i = 0; i < measR; i++) {
+  for(uint16_t i = 0; i < _measR; i++) {
     _canvas->drawFastVLine(_smwidth - 1 - i, 0, _smheight, _barcolor);
   }
   
@@ -523,6 +526,11 @@ void SoundMeterWidget::loop(){
 void SoundMeterWidget::_clear(){
   dsp.fillRect(_config.left, _config.top, _smwidth, _smheight, _bgcolor);
 }
+
+void SoundMeterWidget::_reset(){
+  _measL = 0;
+  _measR = 0;
+}
 #else // DSP_LCD or DSP_OLED
 SoundMeterWidget::~SoundMeterWidget() { }
 void SoundMeterWidget::init(WidgetConfig wconf, uint16_t width, uint16_t height, uint16_t barcolor, uint16_t bgcolor) {
@@ -531,6 +539,7 @@ void SoundMeterWidget::init(WidgetConfig wconf, uint16_t width, uint16_t height,
 void SoundMeterWidget::_draw(){ }
 void SoundMeterWidget::loop(){ }
 void SoundMeterWidget::_clear(){ }
+void SoundMeterWidget::_reset(){ }
 #endif
 
 /************************
