@@ -285,13 +285,13 @@ void DspCore::updateScreensaver() {
 
 void DspCore::showSoundMeterClock() {
     // Show time on line 1
-    char timeBuf[41];
+    char timeBuf[6]; // HH:MM + null terminator
     strftime(timeBuf, sizeof(timeBuf), "%H:%M", &network.timeinfo);
     
     #if defined(LCD_4002)
       // Center on 40 char display
       char line[41];
-      int padding = (40 - strlen(timeBuf)) / 2;
+      const int padding = (40 - strlen(timeBuf)) / 2;
       memset(line, ' ', 40);
       memcpy(line + padding, timeBuf, strlen(timeBuf));
       line[40] = '\0';
@@ -300,7 +300,7 @@ void DspCore::showSoundMeterClock() {
     #elif defined(LCD_2004) || defined(LCD_2002)
       // Center on 20 char display
       char line[21];
-      int padding = (20 - strlen(timeBuf)) / 2;
+      const int padding = (20 - strlen(timeBuf)) / 2;
       memset(line, ' ', 20);
       memcpy(line + padding, timeBuf, strlen(timeBuf));
       line[20] = '\0';
@@ -309,7 +309,7 @@ void DspCore::showSoundMeterClock() {
     #else
       // Center on 16 char display
       char line[17];
-      int padding = (16 - strlen(timeBuf)) / 2;
+      const int padding = (16 - strlen(timeBuf)) / 2;
       memset(line, ' ', 16);
       memcpy(line + padding, timeBuf, strlen(timeBuf));
       line[16] = '\0';
@@ -351,10 +351,17 @@ void DspCore::updateSoundMeter() {
     if(_soundMeterMeasL > halfWidth) _soundMeterMeasL = halfWidth;
     if(_soundMeterMeasR > halfWidth) _soundMeterMeasR = halfWidth;
     
-    // Build sound meter line
+    // Build sound meter line based on display width
     // Left channel: from left edge (0) towards center
     // Right channel: from right edge towards center
-    char line[41];
+    #if defined(LCD_4002)
+      char line[41]; // 40 chars + null
+    #elif defined(LCD_2004) || defined(LCD_2002)
+      char line[21]; // 20 chars + null
+    #else
+      char line[17]; // 16 chars + null
+    #endif
+    
     memset(line, ' ', displayWidth);
     
     // Fill left channel (from left)
