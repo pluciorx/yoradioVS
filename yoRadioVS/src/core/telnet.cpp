@@ -304,7 +304,7 @@ void Telnet::on_input(const char* str, uint8_t clientId) {
     if (sscanf(str, "lcdanimation(%d)", &animation) == 1 || sscanf(str, "cli.lcdanimation(\"%d\")", &animation) == 1 || sscanf(str, "lcdanimation %d", &animation) == 1) {
 		animation = constrain(animation, 0, ANIM_TYPE_COUNT);
         config.setLcdAnimationType((uint8_t) animation);
-        printf(clientId, "##CLI.LCDANIMATION#: %s (%d)\n> ",
+        printf(clientId, "##CLI.LCDANIMATION SET#: %s (%d)\n> ",
             animations[config.store.lcdAnimationType].animName, config.store.lcdAnimationType);
         return;
     }

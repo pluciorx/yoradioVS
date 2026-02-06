@@ -150,6 +150,7 @@
     <ClCompile Include="src\displays\fonts\yofont10x14.c" />
     <ClCompile Include="src\displays\fonts\yofont5x7.c" />
     <ClCompile Include="src\displays\nextion.cpp" />
+    <ClCompile Include="src\displays\tools\utf8Pol.cpp" />
     <ClCompile Include="src\displays\tools\utf8Rus.cpp" />
     <ClCompile Include="src\displays\widgets\pages.cpp" />
     <ClCompile Include="src\displays\widgets\widgets.cpp" />
@@ -276,7 +277,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="locale\displayL10n_en.h" />
+    <ClInclude Include="locale\displayL10n_pl.h" />
     <ClInclude Include="locale\displayL10n_ru.h" />
+    <ClInclude Include="locale\namedays_PL.h" />
     <ClInclude Include="myoptions.h" />
     <ClInclude Include="src\Adafruit_GC9106Ex\Adafruit_GC9106Ex.h" />
     <ClInclude Include="src\Adafruit_GC9A01A\Adafruit_GC9A01A.h" />
@@ -407,6 +410,7 @@
     <ClInclude Include="src\displays\tools\commongfx.h" />
     <ClInclude Include="src\displays\tools\l10n.h" />
     <ClInclude Include="src\displays\tools\oledcolorfix.h" />
+    <ClInclude Include="src\displays\tools\polishChars.h" />
     <ClInclude Include="src\displays\tools\psframebuffer.h" />
     <ClInclude Include="src\displays\tools\tftinverttitle.h" />
     <ClInclude Include="src\displays\tools\utf8Rus.h" />

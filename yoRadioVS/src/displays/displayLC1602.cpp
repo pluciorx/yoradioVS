@@ -4,8 +4,11 @@
 #include <WiFi.h>
 #include "../core/config.h"
 #include "../core/network.h"
-#include "../core/timekeeper.h"
 #include "animations.h"
+
+#if L10N_LANGUAGE == PL
+#include "tools/polishChars.h"
+#endif
 
 #ifndef SCREEN_ADDRESS
   #define SCREEN_ADDRESS 0x27 ///< See datasheet for Address or scan it https://create.arduino.cc/projecthub/abdularbi17/how-to-scan-i2c-address-in-arduino-eaadda
@@ -100,6 +103,19 @@ void DspCore::initDisplay() {
     begin(16, 2);
   #endif
 #endif
+
+#if L10N_LANGUAGE == PL
+  // Load Polish custom characters into CGRAM
+  createChar(0, (uint8_t*)char_a_ogonek);  // ą
+  createChar(1, (uint8_t*)char_c_acute);   // ć
+  createChar(2, (uint8_t*)char_e_ogonek);  // ę
+  createChar(3, (uint8_t*)char_l_stroke);  // ł
+  createChar(4, (uint8_t*)char_n_acute);   // ń
+  createChar(5, (uint8_t*)char_o_acute);   // ó
+  createChar(6, (uint8_t*)char_s_acute);   // ś
+  createChar(7, (uint8_t*)char_z_dot);     // ż
+#endif
+
   clearClipping();
 }
 
@@ -150,13 +166,15 @@ void DspCore::wake(void) {
 void DspCore::showAnimationFrame(const AnimFrame* frame) {
     if (frame == nullptr) return;
 
+    static char prevLine1[41] = "";
+    static char prevLine2[41] = "";
+    
     char line1[41];
     char line2[41];
     strcpy(line1, frame->line1);
     strcpy(line2, frame->line2);
     
     // Replace time placeholder
-  
     char timeBuf[6];
     strftime(timeBuf, sizeof(timeBuf), "%H:%M", &network.timeinfo);
     char* pos = strstr(line1, "HH:MM");
@@ -180,11 +198,36 @@ void DspCore::showAnimationFrame(const AnimFrame* frame) {
         memcpy(pos, dateBuf, 10);
     }
 
-    clear();
-    setCursor(0, 0);
-    print(line1);
-    setCursor(0, 1);
-    print(line2);
+    // Pad lines to full display width to clear old content
+    uint16_t displayWidth = width();
+    int len1 = strlen(line1);
+    int len2 = strlen(line2);
+    
+    // Pad with spaces to full width
+    for(int i = len1; i < displayWidth; i++) {
+        line1[i] = ' ';
+    }
+    line1[displayWidth] = '\0';
+    
+    for(int i = len2; i < displayWidth; i++) {
+        line2[i] = ' ';
+    }
+    line2[displayWidth] = '\0';
+
+    // Only update lines that have changed
+    if (strcmp(line1, prevLine1) != 0) {
+        setCursor(0, 0);
+        print(line1);
+        strcpy(prevLine1, line1);
+        yield();  // Let ESP32 service watchdog and background tasks
+    }
+    
+    if (strcmp(line2, prevLine2) != 0) {
+        setCursor(0, 1);
+        print(line2);
+        strcpy(prevLine2, line2);
+        yield();  // Let ESP32 service watchdog and background tasks
+    }
 }
 
 void DspCore::initScreensaver(AnimationType type) {
