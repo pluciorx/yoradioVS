@@ -176,16 +176,16 @@ void TimeKeeper::_doAfterWait(){
   }
 }
 
-void TimeKeeper::_upClock(){
+void TimeKeeper::_upClock() {
 #if RTCSUPPORTED
-  if(config.isRTCFound()) rtc.getTime(&network.timeinfo);
+    if (config.isRTCFound() && display.mode() != SCREENSAVER) rtc.getTime(&network.timeinfo);
 #else
-  if(network.timeinfo.tm_year>100 || network.status == SDREADY) {
-    network.timeinfo.tm_sec++;
-    mktime(&network.timeinfo);
-  }
+    if (network.timeinfo.tm_year > 100 || network.status == SDREADY) {
+        network.timeinfo.tm_sec++;
+        mktime(&network.timeinfo);
+    }
 #endif
-  if(display.ready()) display.putRequest(CLOCK);
+    if (display.ready()) display.putRequest(CLOCK);
 }
 
 void TimeKeeper::_upScreensaver(){

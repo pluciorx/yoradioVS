@@ -67,6 +67,28 @@ const AnimFrame ballAnimation[] = {
   {"        o           ", "                    "},
 };
 
+const AnimFrame snakeAnimation[] = {
+  {"S                   ", "                    "},
+  {" S                  ", "                    "},
+  {"  S                 ", "                    "},
+  {"   S                ", "                    "},
+  {"    S               ", "                    "},
+  {"     S              ", "                    "},
+  {"      S             ", "                    "},
+  {"       S            ", "                    "},
+  {"        S           ", "                    "},
+  {"         S          ", "                    "},
+  // reverse (exclude endpoint duplicate)
+  {"        S           ", "                    "},
+  {"       S            ", "                    "},
+  {"      S             ", "                    "},
+  {"     S              ", "                    "},
+  {"    S               ", "                    "},
+  {"   S                ", "                    "},
+  {"  S                 ", "                    "},
+  {" S                  ", "                    "}
+};
+
 // Fish animation for 40x2
 const AnimFrame fishAnimation40[] = {
   {">'>                                    ", "                                    >'>"},
@@ -118,72 +140,116 @@ const AnimFrame starAnimation40[] = {
 
 // Wave animation for 40x2
 const AnimFrame waveAnimation40[] = {
-  {"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", "                                        "},
-  {" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", "~                                       "},
-  {"  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", "~~                                      "},
-  {"   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", "~~~                                     "},
-  {"    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", "~~~~                                    "},
-  {"     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", "~~~~~                                   "},
-  {"      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", "~~~~~~                                  "},
-  {"       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", "~~~~~~~                                 "},
-  {"        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", "~~~~~~~~                                "},
-  {"         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", "~~~~~~~~~                               "}
+  {"~~~~~     ~~~~~     ~~~~~     ~~~~~", "     ~~~~~     ~~~~~     ~~~~~     "},
+  {"~~~~~     ~~~~~     ~~~~~     ~~~~~ ", "    ~~~~~     ~~~~~     ~~~~~     ~"},
+  {"~~~~~     ~~~~~     ~~~~~     ~~~~~  ", "   ~~~~~     ~~~~~     ~~~~~     ~~"},
+  {"~~~~~     ~~~~~     ~~~~~     ~~~~~   ", "  ~~~~~     ~~~~~     ~~~~~     ~~~"},
+  {"~~~~~     ~~~~~     ~~~~~     ~~~~~    ", " ~~~~~     ~~~~~     ~~~~~     ~~~~"},
+  {"~~~~~     ~~~~~     ~~~~~     ~~~~~     ", "~~~~~     ~~~~~     ~~~~~     ~~~~~"},
+  {"~~~~~     ~~~~~     ~~~~~     ~~~~~      ", "~~~~~     ~~~~~     ~~~~~     ~~~~~ "},
+  {"~~~~~     ~~~~~     ~~~~~     ~~~~~       ", "~~~~~     ~~~~~     ~~~~~     ~~~~~  "},
+  {"~~~~~     ~~~~~     ~~~~~     ~~~~~        ", "~~~~~     ~~~~~     ~~~~~     ~~~~~   "},
+  {"~~~~~     ~~~~~     ~~~~~     ~~~~~         ", "~~~~~     ~~~~~     ~~~~~     ~~~~~    "},
 };
 
-// Bouncing ball animation for 40x2
+// Ball animation for 40x2 — top moves left->right, bottom moves right->left (opposite)
 const AnimFrame ballAnimation40[] = {
-  {"                   o                    ", "                                        "},
-  {"                  o                     ", "                                        "},
-  {"                 o                      ", "                                        "},
-  {"                o                       ", "                                        "},
-  {"               o                        ", "                                        "},
-  {"              o                         ", "                                        "},
-  {"             o                          ", "                                        "},
-  {"            o                           ", "                                        "},
-  {"           o                            ", "                                        "},
-  {"          o                             ", "                                        "},
-  {"         o                              ", "                                        "},
-  {"        o                               ", "                                        "},
-  {"       o                                ", "                                        "},
-  {"      o                                 ", "                                        "},
-  {"     o                                  ", "                                        "},
-  {"    o                                   ", "                                        "},
-  {"   o                                    ", "                                        "},
-  {"  o                                     ", "                                        "},
-  {" o                                      ", "                                        "},
-  {"o                                       ", "                                        "},
-  {" o                                      ", "                                        "},
-  {"  o                                     ", "                                        "},
-  {"   o                                    ", "                                        "},
-  {"    o                                   ", "                                        "},
-  {"     o                                  ", "                                        "},
-  {"      o                                 ", "                                        "},
-  {"       o                                ", "                                        "},
-  {"        o                               ", "                                        "},
-  {"         o                              ", "                                        "},
-  {"          o                             ", "                                        "},
-  {"           o                            ", "                                        "},
-  {"            o                           ", "                                        "},
-  {"             o                          ", "                                        "},
-  {"              o                         ", "                                        "},
-  {"               o                        ", "                                        "},
-  {"                o                       ", "                                        "},
-  {"                 o                      ", "                                        "},
-  {"                  o                     ", "                                        "},
+  {"o                                       ", "                                       ."},
+  {" o                                      ", "                                      . "},
+  {"  o                                     ", "                                     .  "},
+  {"   o                                    ", "                                    .   "},
+  {"    o                                   ", "                                   .    "},
+  {"     o                                  ", "                                  .     "},
+  {"      o                                 ", "                                 .      "},
+  {"       o                                ", "                                .       "},
+  {"        o                               ", "                               .        "},
+  {"         o                              ", "                              .         "},
+  {"          o                             ", "                             .          "},
+  {"           o                            ", "                            .           "},
+  {"            o                           ", "                           .            "},
+  {"             o                          ", "                          .             "},
+  {"              o                         ", "                         .              "},
+  {"               o                        ", "                        .               "},
+  {"                o                       ", "                       .                "},
+  {"                 o                      ", "                      .                 "},
+  {"                  o                     ", "                     .                  "},
+  {"                   o                    ", "                    .                   "},
+  {"                    o                   ", "                   .                    "},
+  {"                     o                  ", "                  .                     "},
+  {"                      o                 ", "                 .                      "},
+  {"                       o                ", "                .                       "},
+  {"                        o               ", "               .                        "},
+  {"                         o              ", "              .                         "},
+  {"                          o             ", "             .                          "},
+  {"                           o            ", "            .                           "},
+  {"                            o           ", "           .                            "},
+  {"                             o          ", "          .                             "},
+  {"                              o         ", "         .                              "},
+  {"                               o        ", "        .                               "},
+  {"                                o       ", "       .                                "},
+  {"                                 o      ", "      .                                 "},
+  {"                                  o     ", "     .                                  "},
+  {"                                   o    ", "    .                                   "},
+  {"                                    o   ", "   .                                    "},
+  {"                                     o  ", "  .                                     "},
+  {"                                      o ", " .                                      "},
+  {"                                       o", ".                                       "}
+};
+
+// Snake animation for 40x2 — snake eats dots across top row, tail follows
+const AnimFrame snakeAnimation40[] = {
+{"▒▒█                                     ", "    o                                   "},
+{" ▒▒█                                    ", "     o                                  "},
+{"  ▒▒█                                   ", "      o                                 "},
+{"   ▒▒█                                  ", "       o                                "},
+{"    ▒▒█                                 ", "        o                               "},
+{"     ▒▒█                                ", "         o                              "},
+{"      ▒▒█                               ", "          o                             "},
+{"       ▒▒█                              ", "           o                            "},
+{"        ▒▒█                             ", "            o                           "},
+{"         ▒▒█                            ", "             o                          "},
+{"          ▒▒█                           ", "              o                         "},
+{"           ▒▒█                          ", "               o                        "},
+{"            ▒▒█                         ", "                o                       "},
+{"             ▒▒█                        ", "                 o                      "},
+{"              ▒▒█                       ", "                  o                     "},
+{"               ▒▒█                      ", "                   o                    "},
+{"                ▒▒█                     ", "                    o                   "},
+{"                 ▒▒█                    ", "                     o                  "},
+{"                  ▒▒█                   ", "                      o                 "},
+{"                   ▒▒█                  ", "                       o                "},
+{"                  █▒▒                   ", "                      o                 "},
+{"                 █▒▒                    ", "                     o                  "},
+{"                █▒▒                     ", "                    o                   "},
+{"               █▒▒                      ", "                   o                    "},
+{"              █▒▒                       ", "                  o                     "},
+{"             █▒▒                        ", "                 o                      "},
+{"            █▒▒                         ", "                o                       "},
+{"           █▒▒                          ", "               o                        "},
+{"          █▒▒                           ", "              o                         "},
+{"         █▒▒                            ", "             o                          "},
+{"        █▒▒                             ", "            o                           "},
+{"       █▒▒                              ", "           o                            "},
+{"      █▒▒                               ", "          o                             "},
+{"     █▒▒                                ", "         o                              "},
+{"    █▒▒                                 ", "        o                               "},
+{"   █▒▒                                  ", "       o                                "},
+{"  █▒▒                                   ", "      o                                 "},
+{" █▒▒                                    ", "     o                                  "},
 };
 
 // Bouncing clock animation for 40x2 (positions for time display)
-// Note: HH:MM:SS and DD/MM/YYYY are placeholder strings that should be
+// Note: HH:MM and DD/MM/YYYY are placeholder strings that should be
 // replaced with actual time/date values at runtime when this animation type is used
 const AnimFrame clockAnimation40[] = {
-  {"            HH:MM:SS                    ", "          DD/MM/YYYY                    "},
-  {"               HH:MM:SS                 ", "             DD/MM/YYYY                 "},
-  {"                  HH:MM:SS              ", "                DD/MM/YYYY              "},
-  {"                     HH:MM:SS           ", "                   DD/MM/YYYY           "},
-  {"                        HH:MM:SS        ", "                      DD/MM/YYYY        "},
-  {"                     HH:MM:SS           ", "                   DD/MM/YYYY           "},
-  {"                  HH:MM:SS              ", "                DD/MM/YYYY              "},
-  {"               HH:MM:SS                 ", "             DD/MM/YYYY                 "}
+  {"            HH:MM                      ", "          DD/MM/YYYY                    "},
+  {"               HH:MM                   ", "             DD/MM/YYYY                 "},
+  {"                  HH:MM                ", "                DD/MM/YYYY              "},
+  {"                     HH:MM             ", "                   DD/MM/YYYY           "},
+  {"                        HH:MM          ", "                      DD/MM/YYYY        "},
+  {"                     HH:MM             ", "                   DD/MM/YYYY           "},
+  {"                  HH:MM                ", "                DD/MM/YYYY              "},
+  {"               HH:MM                   ", "             DD/MM/YYYY                 "}
 };
 
 // Animation configuration
@@ -192,6 +258,7 @@ enum AnimationType : uint8_t {
 	ANIM_STARS,
 	ANIM_WAVES,
 	ANIM_BALL,
+	ANIM_SNAKE,
 	ANIM_CLOCK_ONLY,  // Keep existing clock behavior
 	ANIM_TYPE_COUNT   // Number of animation types
 };
@@ -201,24 +268,29 @@ struct Animation {
 	uint8_t frameCount;
 	uint16_t frameDuration;  // milliseconds per frame
 	AnimationType type;
+	char animName[20];  // Optional: name for debugging or CLI display
 };
+
 
 // Animation definitions
 const Animation animations[] = {
-  {fishAnimation, sizeof(fishAnimation) / sizeof(AnimFrame), 150, ANIM_FISH},
-  {starAnimation, sizeof(starAnimation) / sizeof(AnimFrame), 300, ANIM_STARS},
-  {waveAnimation, sizeof(waveAnimation) / sizeof(AnimFrame), 200, ANIM_WAVES},
-  {ballAnimation, sizeof(ballAnimation) / sizeof(AnimFrame), 100, ANIM_BALL},
-  {nullptr, 0, 0, ANIM_CLOCK_ONLY}
+  {fishAnimation, sizeof(fishAnimation) / sizeof(AnimFrame), 150, ANIM_FISH, "FISH"},
+  {starAnimation, sizeof(starAnimation) / sizeof(AnimFrame), 300, ANIM_STARS, "STARS"},
+  {waveAnimation, sizeof(waveAnimation) / sizeof(AnimFrame), 200, ANIM_WAVES, "WAVES"},
+  {ballAnimation, sizeof(ballAnimation) / sizeof(AnimFrame), 150, ANIM_BALL, "BALL"},
+  {snakeAnimation, sizeof(snakeAnimation) / sizeof(AnimFrame), 120, ANIM_SNAKE, "SNAKE"},
+  {nullptr, 0, 0, ANIM_CLOCK_ONLY, "CLOCK_ONLY"}
 };
 
 // Animation definitions for 40x2 displays
+// Animation definitions for 40x2 displays
 const Animation animations40[] = {
-  {fishAnimation40, sizeof(fishAnimation40) / sizeof(AnimFrame), 150, ANIM_FISH},
-  {starAnimation40, sizeof(starAnimation40) / sizeof(AnimFrame), 300, ANIM_STARS},
-  {waveAnimation40, sizeof(waveAnimation40) / sizeof(AnimFrame), 200, ANIM_WAVES},
-  {ballAnimation40, sizeof(ballAnimation40) / sizeof(AnimFrame), 100, ANIM_BALL},
-  {clockAnimation40, sizeof(clockAnimation40) / sizeof(AnimFrame), 1000, ANIM_CLOCK_ONLY}
+  {fishAnimation40, sizeof(fishAnimation40) / sizeof(AnimFrame), 150, ANIM_FISH, "FISH"},
+  {starAnimation40, sizeof(starAnimation40) / sizeof(AnimFrame), 300, ANIM_STARS, "STARS"},
+  {waveAnimation40, sizeof(waveAnimation40) / sizeof(AnimFrame), 200, ANIM_WAVES, "WAVES"},
+  {ballAnimation40, sizeof(ballAnimation40) / sizeof(AnimFrame), 150, ANIM_BALL, "BALL"},
+  {snakeAnimation40, sizeof(snakeAnimation40) / sizeof(AnimFrame), 150, ANIM_SNAKE, "SNAKE"},
+  {clockAnimation40, sizeof(clockAnimation40) / sizeof(AnimFrame), 1000, ANIM_CLOCK_ONLY, "CLOCK_ONLY"}
 };
 
 #endif

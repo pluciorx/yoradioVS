@@ -4,6 +4,7 @@
 #include <WiFi.h>
 #include "../core/config.h"
 #include "../core/network.h"
+#include "../core/timekeeper.h"
 #include "animations.h"
 
 #ifndef SCREEN_ADDRESS
@@ -153,17 +154,18 @@ void DspCore::showAnimationFrame(const AnimFrame* frame) {
     char line2[41];
     strcpy(line1, frame->line1);
     strcpy(line2, frame->line2);
-
+    
     // Replace time placeholder
-    char timeBuf[9];
-    strftime(timeBuf, sizeof(timeBuf), "%H:%M:%S", &network.timeinfo);
-    char* pos = strstr(line1, "HH:MM:SS");
+  
+    char timeBuf[6];
+    strftime(timeBuf, sizeof(timeBuf), "%H:%M", &network.timeinfo);
+    char* pos = strstr(line1, "HH:MM");
     if (pos) {
-        memcpy(pos, timeBuf, 8);
+        memcpy(pos, timeBuf, 5);
     }
-    pos = strstr(line2, "HH:MM:SS");
+    pos = strstr(line2, "HH:MM");
     if (pos) {
-        memcpy(pos, timeBuf, 8);
+        memcpy(pos, timeBuf, 5);
     }
 
     // Replace date placeholder

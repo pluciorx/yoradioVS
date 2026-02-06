@@ -213,8 +213,11 @@ void Display::_buildPager(){
   if(_heapbar)  _footer->addWidget( _heapbar);
   
   if(_metabackground) pages[PG_PLAYER]->addWidget( _metabackground);
+
   pages[PG_PLAYER]->addWidget(_meta);
   pages[PG_PLAYER]->addWidget(_title1);
+
+
   if(_title2) pages[PG_PLAYER]->addWidget(_title2);
   if(_weather) pages[PG_PLAYER]->addWidget(_weather);
   #if BITRATE_FULL
@@ -461,7 +464,8 @@ void Display::loop() {
     return;
   }
   if(displayQueue==NULL || _locked) return;
-  _pager->loop();
+  if(!(_mode == SCREENSAVER ))  _pager->loop();
+
 #ifdef USE_NEXTION
   nextion.loop();
 #endif
@@ -475,13 +479,21 @@ void Display::loop() {
         case CLOSEPLAYLIST: player.sendCommand({PR_PLAY, request.payload}); break;
         case CLOCK: 
           //if(_mode==PLAYER || (_mode==SCREENSAVER) _time(request.payload==1); 
-            if (_mode == PLAYER ) _time(request.payload == 1);
+            if (_mode == PLAYER) _time(request.payload == 1);
+#ifdef DSP_LCD
+            if (_mode == SCREENSAVER) _clock->updateTime();
+#endif
           /*#ifdef USE_NEXTION
             if(_mode==TIMEZONE) nextion.localTime(network.timeinfo);
             if(_mode==INFO)     nextion.rssi();
           #endif*/
           break;
-        case NEWTITLE: _title(); break;
+        case NEWTITLE: {
+            if (_mode != SCREENSAVER) {
+                _title();
+            }
+        }break;
+        
         case NEWSTATION: _station(); break;
         case NEXTSTATION: _drawNextStationNum(request.payload); break;
         case DRAWPLAYLIST: _drawPlaylist(); break;

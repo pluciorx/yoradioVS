@@ -304,15 +304,16 @@ void Telnet::on_input(const char* str, uint8_t clientId) {
     if (sscanf(str, "lcdanimation(%d)", &animation) == 1 || sscanf(str, "cli.lcdanimation(\"%d\")", &animation) == 1 || sscanf(str, "lcdanimation %d", &animation) == 1) {
 		animation = constrain(animation, 0, ANIM_TYPE_COUNT);
         config.setLcdAnimationType((uint8_t) animation);
-        
+        printf(clientId, "##CLI.LCDANIMATION#: %s (%d)\n> ",
+            animations[config.store.lcdAnimationType].animName, config.store.lcdAnimationType);
         return;
     }
 
 
-    if (strcmp(str, "cli.lcdanimation") == 0 || strcmp(str, "lcdanimation") == 0) {
-        const char* animNames[] = { "FISH", "STARS", "WAVES", "BALL", "CLOCK_ONLY" };
+    if (strcmp(str, "cli.lcdanimation") == 0 || strcmp(str, "lcdanimation") == 0) {        
         printf(clientId, "##CLI.LCDANIMATION#: %s (%d)\n> ",
-            animNames[config.store.lcdAnimationType], config.store.lcdAnimationType);
+            animations[config.store.lcdAnimationType].animName, config.store.lcdAnimationType);
+             
         return;
     }
 

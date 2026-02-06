@@ -434,7 +434,7 @@ void Config::setScreensaverPlayingBlank(bool val){
 }
 
 void Config::setLcdAnimationType(uint8_t val) {
-    if (val > 3) val = 0;  // Validate: 0-3 only
+    
     saveValue(&store.lcdAnimationType, val);
 }
 

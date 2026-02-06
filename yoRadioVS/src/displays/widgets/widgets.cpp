@@ -621,6 +621,10 @@ void ClockWidget::_begin(){
 #endif
 }
 
+void ClockWidget::updateTime() {
+    _getTime();
+}
+
 bool ClockWidget::_getTime(){
   strftime(_timebuffer, sizeof(_timebuffer), "%H:%M", &network.timeinfo);
   bool ret = network.timeinfo.tm_sec==0 || _forceflag!=network.timeinfo.tm_year;

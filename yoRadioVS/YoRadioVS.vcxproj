@@ -252,6 +252,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include=".github\copilot-instructions.md" />
     <None Include="data\www\dragpl.js.gz" />
     <None Include="data\www\ir.css.gz" />
     <None Include="data\www\ir.js.gz" />
