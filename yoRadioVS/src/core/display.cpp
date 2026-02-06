@@ -93,9 +93,6 @@ Display::~Display() {
   delete _plwidget;
   delete _nums;
   delete _clock;
-  #if !defined(DSP_LCD) && !defined(DSP_OLED)
-    delete _soundmeter;
-  #endif
   delete _meta;
   delete _title1;
   delete _title2;
@@ -124,11 +121,6 @@ void Display::init() {
   _plwidget = new PlayListWidget();
   _nums = new NumWidget();
   _clock = new ClockWidget();
-  #if !defined(DSP_LCD) && !defined(DSP_OLED)
-    _soundmeter = new SoundMeterWidget();
-  #else
-    _soundmeter = nullptr;
-  #endif
   _meta = new ScrollWidget();
   _title1 = new ScrollWidget();
   _plcurrent = new ScrollWidget();
@@ -239,29 +231,6 @@ void Display::_buildPager(){
   pages[PG_PLAYER]->addWidget(_clock);
   pages[PG_SCREENSAVER]->addWidget(_clock);
   
-  // Initialize sound meter widget for screensaver
-  #if !defined(DSP_LCD) && !defined(DSP_OLED)
-    WidgetConfig smConf;
-    smConf.left = TFT_FRAMEWDT;
-    // Position the sound meter based on screen height - place it in the lower portion
-    // Typically TIME_SIZE*CHARHEIGHT is the clock height, add some spacing
-    #if TIME_SIZE >= 35  // For larger displays with big clocks
-      smConf.top = clockConf.top + TIME_SIZE + 10;
-      uint16_t smHeight = 12;
-    #elif TIME_SIZE >= 19 // Medium size clocks
-      smConf.top = clockConf.top + TIME_SIZE + 8;
-      uint16_t smHeight = 10;
-    #else  // Smaller displays
-      smConf.top = clockConf.top + TIME_SIZE + 5;
-      uint16_t smHeight = 8;
-    #endif
-    smConf.textsize = 0;
-    smConf.align = WA_CENTER;
-    uint16_t smWidth = dsp.width() - TFT_FRAMEWDT * 2;
-    _soundmeter->init(smConf, smWidth, smHeight, config.theme.clock, config.theme.background);
-    pages[PG_SCREENSAVER]->addWidget(_soundmeter);
-  #endif
-  
   pages[PG_PLAYER]->addPage(_footer);
 
   if(_metabackground) pages[PG_DIALOG]->addWidget( _metabackground);
@@ -340,9 +309,6 @@ void Display::_start() {
   if(_weather && config.store.showweather)  _weather->setText(LANG::const_getWeather);
 
   if(_vuwidget) _vuwidget->lock();
-  #if !defined(DSP_LCD) && !defined(DSP_OLED)
-    if(_soundmeter) _soundmeter->lock(!config.store.soundMeterEnabled);
-  #endif
   if(_rssi)     _setRSSI(WiFi.RSSI());
   #ifndef HIDE_IP
     if(_volip) _volip->setText(config.ipToStr(WiFi.localIP()), iptxtFmt);
@@ -605,12 +571,6 @@ void Display::loop() {
   #ifdef DSP_LCD
     if(_mode == SCREENSAVER) {
       dsp.updateScreensaver();
-    }
-  #endif
-
-  #if !defined(DSP_LCD) && !defined(DSP_OLED)
-    if(_mode == SCREENSAVER && _soundmeter && config.store.soundMeterEnabled) {
-      _soundmeter->loop();
     }
   #endif
 

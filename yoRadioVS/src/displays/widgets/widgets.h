@@ -169,27 +169,6 @@ class VuWidget: public Widget {
     void _clear();
 };
 
-class SoundMeterWidget: public Widget {
-  public:
-    SoundMeterWidget() {}
-    SoundMeterWidget(WidgetConfig wconf, uint16_t width, uint16_t height, uint16_t barcolor, uint16_t bgcolor)
-            { init(wconf, width, height, barcolor, bgcolor); }
-    ~SoundMeterWidget();
-    using Widget::init;
-    void init(WidgetConfig wconf, uint16_t width, uint16_t height, uint16_t barcolor, uint16_t bgcolor);
-    void loop();
-  protected:
-    #if !defined(DSP_LCD) && !defined(DSP_OLED)
-      Canvas *_canvas;
-    #endif
-    uint16_t _barcolor;
-    uint16_t _smwidth, _smheight;
-    uint16_t _measL, _measR;
-    void _draw();
-    void _clear();
-    void _reset();
-};
-
 class NumWidget: public TextWidget {
   public:
     using Widget::init;

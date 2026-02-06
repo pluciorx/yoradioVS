@@ -18,7 +18,6 @@ class VuWidget;
 class NumWidget;
 class ClockWidget;
 class TextWidget;
-class SoundMeterWidget;
     
 class Display {
   public:
@@ -56,7 +55,6 @@ class Display {
     VuWidget *_vuwidget;
     NumWidget *_nums;
     ClockWidget *_clock;
-    SoundMeterWidget *_soundmeter;
     Page *_boot;
     TextWidget *_bootstring, *_volip, *_voltxt, *_rssi, *_bitrate;
     bool _locked = false;
