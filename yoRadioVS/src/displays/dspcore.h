@@ -106,4 +106,12 @@
 
 //extern DspCore dsp;
 
+#ifdef DSP_LCD
+  // ... existing methods ...
+  void initScreensaver(AnimationType type);
+  void updateScreensaver();
+  void showAnimationFrame(const AnimFrame* frame);
+  void updateSoundMeter();  // Add this line
+#endif
+
 #endif

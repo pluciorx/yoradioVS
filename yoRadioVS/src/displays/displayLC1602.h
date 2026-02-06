@@ -51,10 +51,10 @@ private:
   uint8_t _totalFrames;
   uint32_t _lastUpdate;
   uint16_t _frameDuration;
-  AnimationType _currentAnimation;
   const Animation* _animData;
   
 public:
+  AnimationType _currentAnimation;  // Move this to public!
   LCDAnimationController();
   void begin(AnimationType type);
   void update();

@@ -318,7 +318,8 @@ const Animation animations[] = {
   {waveAnimation, sizeof(waveAnimation) / sizeof(AnimFrame), 200, ANIM_WAVES, "WAVES"},
   {ballAnimation, sizeof(ballAnimation) / sizeof(AnimFrame), 100, ANIM_BALL, "BALL"},
   {snakeAnimation, sizeof(snakeAnimation) / sizeof(AnimFrame), 120, ANIM_SNAKE, "SNAKE"},
-  {nullptr, 0, 0, ANIM_CLOCK_ONLY, "CLOCK_ONLY"}
+  {nullptr, 0, 0, ANIM_CLOCK_ONLY, "CLOCK_ONLY"},
+  {nullptr, 0, 0, ANIM_SOUND_METER, "SOUND_METER" }
 };
 
 // Animation definitions for 40x2 displays
@@ -329,7 +330,8 @@ const Animation animations40[] = {
   {waveAnimation40, sizeof(waveAnimation40) / sizeof(AnimFrame), 200, ANIM_WAVES, "WAVES"},
   {ballAnimation40, sizeof(ballAnimation40) / sizeof(AnimFrame), 200, ANIM_BALL, "BALL"},
   {snakeAnimation40, sizeof(snakeAnimation40) / sizeof(AnimFrame), 200, ANIM_SNAKE, "SNAKE"},
-  {clockAnimation40, sizeof(clockAnimation40) / sizeof(AnimFrame), 1000, ANIM_CLOCK_ONLY, "CLOCK_ONLY"}
+  {clockAnimation40, sizeof(clockAnimation40) / sizeof(AnimFrame), 1000, ANIM_CLOCK_ONLY, "CLOCK_ONLY"},
+  { nullptr, 0, 0, ANIM_SOUND_METER, "SOUND_METER" }
 };
 
 #endif
