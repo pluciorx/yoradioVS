@@ -116,6 +116,7 @@ class DspCore: public yoDisplay {
     uint32_t _soundMeterLastUpdate;
     uint16_t _soundMeterMeasL;
     uint16_t _soundMeterMeasR;
+    bool _soundMeterVUMeterWasEnabled; // Store previous vumeter state
     #endif
 };
 

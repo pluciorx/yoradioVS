@@ -79,6 +79,7 @@ DspCore::DspCore(): DSP_INIT {
   _soundMeterLastUpdate = 0;
   _soundMeterMeasL = 0;
   _soundMeterMeasR = 0;
+  _soundMeterVUMeterWasEnabled = false;
 }
 
 void DspCore::apScreen() {
@@ -247,6 +248,13 @@ void DspCore::initScreensaver(AnimationType type) {
         _soundMeterMeasL = 0;
         _soundMeterMeasR = 0;
         
+        // Enable vumeter so get_VUlevel() returns actual values
+        // Store previous state to restore later
+        _soundMeterVUMeterWasEnabled = config.store.vumeter;
+        if (!config.store.vumeter) {
+            config.store.vumeter = true;
+        }
+        
         // Show clock on line 1
         showSoundMeterClock();
         // Clear line 2 for sound meter
@@ -259,6 +267,11 @@ void DspCore::initScreensaver(AnimationType type) {
           print("                "); // 16 spaces
         #endif
     } else {
+        // Restore vumeter state if we had changed it for sound meter
+        if (_soundMeterMode && !_soundMeterVUMeterWasEnabled) {
+            config.store.vumeter = false;
+        }
+        
         _soundMeterMode = false;
         // Show first frame immediately
         const AnimFrame* frame = lcdAnimController.getCurrentFrame();
