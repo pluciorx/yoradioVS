@@ -230,6 +230,7 @@ void Display::_buildPager(){
   if(_vuwidget) pages[PG_PLAYER]->addWidget( _vuwidget);
   pages[PG_PLAYER]->addWidget(_clock);
   pages[PG_SCREENSAVER]->addWidget(_clock);
+  
   pages[PG_PLAYER]->addPage(_footer);
 
   if(_metabackground) pages[PG_DIALOG]->addWidget( _metabackground);

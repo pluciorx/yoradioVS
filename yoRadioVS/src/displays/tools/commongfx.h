@@ -65,6 +65,9 @@ class DspCore: public yoDisplay {
       void initScreensaver(AnimationType type);
       void updateScreensaver();
       void showAnimationFrame(const AnimFrame* frame);
+      // Sound meter methods
+      void showSoundMeterClock();
+      void updateSoundMeter();
     #endif
     void flip();
     void invert();
@@ -106,6 +109,14 @@ class DspCore: public yoDisplay {
     void * _scrollid;
     #ifdef PSFBUFFER
     psFrameBuffer* _fb=nullptr;
+    #endif
+    #ifdef DSP_LCD
+    // Sound meter state
+    bool _soundMeterMode;
+    uint32_t _soundMeterLastUpdate;
+    uint16_t _soundMeterMeasL;
+    uint16_t _soundMeterMeasR;
+    bool _soundMeterVUMeterWasEnabled; // Store previous vumeter state
     #endif
 };
 
