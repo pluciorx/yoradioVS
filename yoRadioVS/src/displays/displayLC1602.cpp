@@ -267,52 +267,119 @@ void DspCore::initScreensaver(AnimationType type) {
 }
 
 void DspCore::updateScreensaver() {
-    // Check if it's sound meter animation - needs special handling
-    if (lcdAnimController._currentAnimation == ANIM_SOUND_METER) {
+    if (_soundMeterMode) {
+        // Update sound meter
         updateSoundMeter();
-        return;
-    }
-    
-    // Regular frame-based animations
-    if (lcdAnimController.needsUpdate()) {
-        lcdAnimController.update();
-        const AnimFrame* frame = lcdAnimController.getCurrentFrame();
-        showAnimationFrame(frame);
+    } else {
+        // Regular animation
+        if (lcdAnimController.needsUpdate()) {
+            lcdAnimController.update();
+            const AnimFrame* frame = lcdAnimController.getCurrentFrame();
+            showAnimationFrame(frame);
+        }
     }
 }
 
-void DspCore::updateSoundMeter() {
-    static uint32_t lastUpdate = 0;
-    if (millis() - lastUpdate < 100) return; // Update every 100ms
-    lastUpdate = millis();
+void DspCore::showSoundMeterClock() {
+    // Show time on line 1 (centered)
+    char timeBuf[6]; // HH:MM + null terminator
+    strftime(timeBuf, sizeof(timeBuf), "%H:%M", &network.timeinfo);
     
-    // Get audio levels from player
-    // get_VUlevel returns uint16_t with L in upper byte, R in lower byte
-    uint16_t vulevel = player.get_VUlevel(width());
-    uint8_t leftLevel = (vulevel >> 8) & 0xFF;
-    uint8_t rightLevel = vulevel & 0xFF;
+    #if defined(LCD_4002)
+      // Center on 40 char display
+      char line[41];
+      const int padding = (40 - strlen(timeBuf)) / 2;
+      memset(line, ' ', 40);
+      memcpy(line + padding, timeBuf, strlen(timeBuf));
+      line[40] = '\0';
+      setCursor(0, 0);
+      print(line);
+    #elif defined(LCD_2004) || defined(LCD_2002)
+      // Center on 20 char display
+      char line[21];
+      const int padding = (20 - strlen(timeBuf)) / 2;
+      memset(line, ' ', 20);
+      memcpy(line + padding, timeBuf, strlen(timeBuf));
+      line[20] = '\0';
+      setCursor(0, 0);
+      print(line);
+    #else
+      // Center on 16 char display
+      char line[17];
+      const int padding = (16 - strlen(timeBuf)) / 2;
+      memset(line, ' ', 16);
+      memcpy(line + padding, timeBuf, strlen(timeBuf));
+      line[16] = '\0';
+      setCursor(0, 0);
+      print(line);
+    #endif
+}
 
-    // Calculate bar lengths for display
-    uint8_t leftBars = map(leftLevel, 0, width(), 0, width());
-    uint8_t rightBars = map(rightLevel, 0, width(), 0, width());
+void DspCore::updateSoundMeter() {
+    // Update sound meter on line 2 (line 1 has the clock)
+    // Get display width
+    #if defined(LCD_4002)
+      const uint8_t displayWidth = 40;
+      const uint8_t halfWidth = 20;
+    #elif defined(LCD_2004) || defined(LCD_2002)
+      const uint8_t displayWidth = 20;
+      const uint8_t halfWidth = 10;
+    #else
+      const uint8_t displayWidth = 16;
+      const uint8_t halfWidth = 8;
+    #endif
     
-    // Build bar strings
-    char line1[41] = "";
-    char line2[41] = "";
+    // Get audio levels
+    uint16_t vulevel = player.get_VUlevel(halfWidth);
+    uint8_t L = (vulevel >> 8) & 0xFF;
+    uint8_t R = vulevel & 0xFF;
     
-    // Fill with bars
-    for (uint8_t i = 0; i < width(); i++) {
-        line1[i] = (i < leftBars) ? '=' : ' ';
-        line2[i] = (i < rightBars) ? '=' : ' ';
+    // Smooth fade
+    const uint8_t fadeRate = 2;
+    bool played = player.isRunning();
+    
+    if(played) {
+        _soundMeterMeasL = (L >= _soundMeterMeasL) ? L : (_soundMeterMeasL > fadeRate ? _soundMeterMeasL - fadeRate : 0);
+        _soundMeterMeasR = (R >= _soundMeterMeasR) ? R : (_soundMeterMeasR > fadeRate ? _soundMeterMeasR - fadeRate : 0);
+    } else {
+        if(_soundMeterMeasL > 0) _soundMeterMeasL = (_soundMeterMeasL > fadeRate) ? _soundMeterMeasL - fadeRate : 0;
+        if(_soundMeterMeasR > 0) _soundMeterMeasR = (_soundMeterMeasR > fadeRate) ? _soundMeterMeasR - fadeRate : 0;
     }
-    line1[width()] = '\0';
-    line2[width()] = '\0';
     
-    // Display
-    setCursor(0, 0);
-    print(line1);
+    if(_soundMeterMeasL > halfWidth) _soundMeterMeasL = halfWidth;
+    if(_soundMeterMeasR > halfWidth) _soundMeterMeasR = halfWidth;
+    
+    // Build sound meter line based on display width
+    // Left channel: from left edge (0) towards center
+    // Right channel: from right edge towards center
+    #if defined(LCD_4002)
+      char line[41]; // 40 chars + null
+    #elif defined(LCD_2004) || defined(LCD_2002)
+      char line[21]; // 20 chars + null
+    #else
+      char line[17]; // 16 chars + null
+    #endif
+    
+    memset(line, ' ', displayWidth);
+    
+    // Fill left channel (from left)
+    for(uint8_t i = 0; i < _soundMeterMeasL; i++) {
+        line[i] = (char)0xFF; // Solid block character
+    }
+    
+    // Fill right channel (from right)
+    for(uint8_t i = 0; i < _soundMeterMeasR; i++) {
+        line[displayWidth - 1 - i] = (char)0xFF; // Solid block character
+    }
+    
+    line[displayWidth] = '\0';
+    
+    // Display on line 2
     setCursor(0, 1);
-    print(line2);
+    print(line);
+    
+    // Also update clock periodically
+    showSoundMeterClock();
 }
 
 #endif
