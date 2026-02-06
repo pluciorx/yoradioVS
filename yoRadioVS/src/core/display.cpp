@@ -340,6 +340,9 @@ void Display::_start() {
   if(_weather && config.store.showweather)  _weather->setText(LANG::const_getWeather);
 
   if(_vuwidget) _vuwidget->lock();
+  #if !defined(DSP_LCD) && !defined(DSP_OLED)
+    if(_soundmeter) _soundmeter->lock(!config.store.soundMeterEnabled);
+  #endif
   if(_rssi)     _setRSSI(WiFi.RSSI());
   #ifndef HIDE_IP
     if(_volip) _volip->setText(config.ipToStr(WiFi.localIP()), iptxtFmt);
@@ -606,7 +609,7 @@ void Display::loop() {
   #endif
 
   #if !defined(DSP_LCD) && !defined(DSP_OLED)
-    if(_mode == SCREENSAVER && _soundmeter) {
+    if(_mode == SCREENSAVER && _soundmeter && config.store.soundMeterEnabled) {
       _soundmeter->loop();
     }
   #endif

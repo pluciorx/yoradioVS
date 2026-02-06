@@ -248,7 +248,7 @@ void NetServer::processQueue(){
                                   config.store.telnet,
                                   config.store.watchdog); 
                                   break;
-      case GETSCREEN:     sprintf (wsBuf, "{\"flip\":%d,\"inv\":%d,\"nump\":%d,\"tsf\":%d,\"tsd\":%d,\"dspon\":%d,\"br\":%d,\"con\":%d,\"scre\":%d,\"scrt\":%d,\"scrb\":%d,\"scrpe\":%d,\"scrpt\":%d,\"scrpb\":%d,\"lcdanim\":%d}", 
+      case GETSCREEN:     sprintf (wsBuf, "{\"flip\":%d,\"inv\":%d,\"nump\":%d,\"tsf\":%d,\"tsd\":%d,\"dspon\":%d,\"br\":%d,\"con\":%d,\"scre\":%d,\"scrt\":%d,\"scrb\":%d,\"scrpe\":%d,\"scrpt\":%d,\"scrpb\":%d,\"lcdanim\":%d,\"soundmeter\":%d}", 
                                   config.store.flipscreen, 
                                   config.store.invertdisplay, 
                                   config.store.numplaylist, 
@@ -263,7 +263,8 @@ void NetServer::processQueue(){
                                   config.store.screensaverPlayingEnabled,
                                   config.store.screensaverPlayingTimeout,
                                   config.store.screensaverPlayingBlank,
-                                  config.store.lcdAnimationType);
+                                  config.store.lcdAnimationType,
+                                  config.store.soundMeterEnabled);
                                   break;
       case GETTIMEZONE:   sprintf (wsBuf, "{\"tzh\":%d,\"tzm\":%d,\"sntp1\":\"%s\",\"sntp2\":\"%s\", \"timeint\":%d,\"timeintrtc\":%d}", 
                                   config.store.tzHour, 

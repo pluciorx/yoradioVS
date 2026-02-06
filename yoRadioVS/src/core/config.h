@@ -30,7 +30,7 @@
   #define ESP_ARDUINO_3 1
 #endif
 
-#define CONFIG_VERSION  5
+#define CONFIG_VERSION  6
 
 enum playMode_e      : uint8_t  { PM_WEB=0, PM_SDCARD=1 };
 
@@ -124,7 +124,8 @@ struct config_t
   bool      screensaverBlank;
   bool      screensaverPlayingEnabled;
   uint16_t  screensaverPlayingTimeout;
-  bool      screensaverPlayingBlank; 
+  bool      screensaverPlayingBlank;
+  bool      soundMeterEnabled;    // Enable sound meter on TFT screensaver
   char      mdnsname[24];
   bool      skipPlaylistUpDown;
   uint16_t  abuff;
@@ -245,6 +246,7 @@ class Config {
     void setScreensaverPlayingTimeout(uint16_t val);
     void setScreensaverPlayingBlank(bool val);
     void setLcdAnimationType(uint8_t val);
+    void setSoundMeterEnabled(bool val);
     void setSntpOne(const char *val);
     void setShowweather(bool val);
     void setWeatherKey(const char *val);

@@ -138,6 +138,9 @@ void Config::_setupVersion(){
     case 5:  
       saveValue(&store.lcdAnimationType, (uint8_t)0);  // Default to FISH animation
       break;
+    case 6:
+      saveValue(&store.soundMeterEnabled, true);  // Default to enabled for existing users
+      break;
     default:
       break;
   }
@@ -438,6 +441,10 @@ void Config::setLcdAnimationType(uint8_t val) {
     saveValue(&store.lcdAnimationType, val);
 }
 
+void Config::setSoundMeterEnabled(bool val) {
+    saveValue(&store.soundMeterEnabled, val);
+}
+
 void Config::setSntpOne(const char *val){
   bool tzdone = false;
   if (strlen(val) > 0 && strlen(store.sntp2) > 0) {
@@ -619,6 +626,7 @@ void Config::setDefaults() {
   store.screensaverPlayingEnabled = false;
   store.screensaverPlayingTimeout = 5;
   store.screensaverPlayingBlank = false;
+  store.soundMeterEnabled = true;  // Default to enabled
   store.abuff = VS1053_CS==255?7:10;
   store.telnet = true;
   store.watchdog = true;
