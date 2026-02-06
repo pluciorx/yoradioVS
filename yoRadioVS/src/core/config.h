@@ -125,7 +125,7 @@ struct config_t
   bool      screensaverPlayingEnabled;
   uint16_t  screensaverPlayingTimeout;
   bool      screensaverPlayingBlank;
-  bool      soundMeterEnabled;    // Enable sound meter on TFT screensaver
+  bool      soundMeterEnabled;    // Enable sound meter on LCD screensaver (use with lcdAnimationType=ANIM_SOUND_METER)
   char      mdnsname[24];
   bool      skipPlaylistUpDown;
   uint16_t  abuff;
@@ -134,7 +134,7 @@ struct config_t
   uint16_t  timeSyncInterval;
   uint16_t  timeSyncIntervalRTC;
   uint16_t  weatherSyncInterval;
-  uint8_t   lcdAnimationType;     // 0=FISH, 1=STARS, 2=WAVES, 3=CLOCK_ONLY (validated against ANIM_TYPE_COUNT)
+  uint8_t   lcdAnimationType;     // 0=FISH, 1=STARS, 2=WAVES, 3=BALL, 4=SNAKE, 5=CLOCK_ONLY, 6=SOUND_METER (validated against ANIM_TYPE_COUNT)
 };
 
 #if IR_PIN!=255

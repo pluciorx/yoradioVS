@@ -298,6 +298,7 @@ enum AnimationType : uint8_t {
 	ANIM_BALL,
 	ANIM_SNAKE,
 	ANIM_CLOCK_ONLY,  // Keep existing clock behavior
+	ANIM_SOUND_METER, // Sound meter for LCD displays
 	ANIM_TYPE_COUNT   // Number of animation types
 };
 
