@@ -93,7 +93,9 @@ Display::~Display() {
   delete _plwidget;
   delete _nums;
   delete _clock;
-  delete _soundmeter;
+  #if !defined(DSP_LCD) && !defined(DSP_OLED)
+    delete _soundmeter;
+  #endif
   delete _meta;
   delete _title1;
   delete _title2;
@@ -122,7 +124,11 @@ void Display::init() {
   _plwidget = new PlayListWidget();
   _nums = new NumWidget();
   _clock = new ClockWidget();
-  _soundmeter = new SoundMeterWidget();
+  #if !defined(DSP_LCD) && !defined(DSP_OLED)
+    _soundmeter = new SoundMeterWidget();
+  #else
+    _soundmeter = nullptr;
+  #endif
   _meta = new ScrollWidget();
   _title1 = new ScrollWidget();
   _plcurrent = new ScrollWidget();
@@ -586,6 +592,12 @@ void Display::loop() {
   #ifdef DSP_LCD
     if(_mode == SCREENSAVER) {
       dsp.updateScreensaver();
+    }
+  #endif
+
+  #if !defined(DSP_LCD) && !defined(DSP_OLED)
+    if(_mode == SCREENSAVER && _soundmeter) {
+      _soundmeter->loop();
     }
   #endif
 
