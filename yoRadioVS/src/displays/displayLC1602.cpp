@@ -4,7 +4,10 @@
 #include <WiFi.h>
 #include "../core/config.h"
 #include "../core/network.h"
+#include "../core/player.h"
 #include "animations.h"
+#include "tools/commongfx.h"
+#include "conf/displayLCD1602conf.h"
 
 #if L10N_LANGUAGE == PL
 #include "tools/polishChars.h"
@@ -72,7 +75,13 @@ const AnimFrame* LCDAnimationController::getCurrentFrame() {
   return &(_animData->frames[_currentFrame]);
 }
 
-DspCore::DspCore(): DSP_INIT {}
+DspCore::DspCore(): DSP_INIT {
+  _soundMeterMode = false;
+  _soundMeterLastUpdate = 0;
+  _soundMeterMeasL = 0;
+  _soundMeterMeasR = 0;
+  _soundMeterVUMeterWasEnabled = false;
+}
 
 void DspCore::apScreen() {
   clear();
@@ -232,16 +241,165 @@ void DspCore::showAnimationFrame(const AnimFrame* frame) {
 
 void DspCore::initScreensaver(AnimationType type) {
     lcdAnimController.begin(type);
-    // Show first frame immediately
-    const AnimFrame* frame = lcdAnimController.getCurrentFrame();
-    showAnimationFrame(frame);
+    
+    if (type == ANIM_SOUND_METER) {
+        // Initialize sound meter mode
+        _soundMeterMode = true;
+        _soundMeterLastUpdate = 0;
+        _soundMeterMeasL = 0;
+        _soundMeterMeasR = 0;
+        
+        // Enable vumeter so get_VUlevel() returns actual values
+        // Store previous state to restore later
+        _soundMeterVUMeterWasEnabled = config.store.vumeter;
+        if (!config.store.vumeter) {
+            config.store.vumeter = true;
+        }
+		
+        // Show clock on line 1
+        showSoundMeterClock(clockConf);
+        // Clear line 2 for sound meter
+        setCursor(0, 1);
+        #if defined(LCD_4002)
+          print("                                        "); // 40 spaces
+        #elif defined(LCD_2004) || defined(LCD_2002)
+          print("                    "); // 20 spaces
+        #else
+          print("                "); // 16 spaces
+        #endif
+    } else {
+        // Restore vumeter state if we had changed it for sound meter
+        if (_soundMeterMode && !_soundMeterVUMeterWasEnabled) {
+            config.store.vumeter = false;
+        }
+        
+        _soundMeterMode = false;
+        // Show first frame immediately
+        const AnimFrame* frame = lcdAnimController.getCurrentFrame();
+        showAnimationFrame(frame);
+    }
 }
 
 void DspCore::updateScreensaver() {
-    if (lcdAnimController.needsUpdate()) {
-        lcdAnimController.update();
-        const AnimFrame* frame = lcdAnimController.getCurrentFrame();
-        showAnimationFrame(frame);
+    if (_soundMeterMode) {
+        // Update sound meter
+        updateSoundMeter();
+    } else {
+        // Regular animation
+        if (lcdAnimController.needsUpdate()) {
+            lcdAnimController.update();
+            const AnimFrame* frame = lcdAnimController.getCurrentFrame();
+            showAnimationFrame(frame);
+        }
+    }
+}
+
+void DspCore::showSoundMeterClock(const WidgetConfig& config) {
+    // Format time string
+    char timeBuf[6]; // HH:MM + null terminator
+    strftime(timeBuf, sizeof(timeBuf), "%H:%M", &network.timeinfo);
+
+    uint16_t displayWidth = width();
+    char line[41]; // Max 40 chars + null
+    memset(line, ' ', displayWidth);
+    line[displayWidth] = '\0';
+
+    int timeLen = strlen(timeBuf);
+    int pos = 0;
+
+    // Calculate position based on alignment
+    switch (config.align) {
+    case WA_LEFT:
+        pos = config.left;
+        break;
+    case WA_CENTER:
+        pos = (displayWidth - timeLen) / 2;
+        break;
+    case WA_RIGHT:
+        pos = displayWidth - timeLen - config.left;
+        break;
+    }
+
+    // Ensure position is within bounds
+    if (pos < 0) pos = 0;
+    if (pos + timeLen > displayWidth) pos = displayWidth - timeLen;
+
+    // Copy time into position
+    memcpy(line + pos, timeBuf, timeLen);
+
+    // Display on specified row
+    setCursor(0, config.top);
+    print(line);
+}
+
+void DspCore::updateSoundMeter() {
+    // Update sound meter on line 2 (line 1 has the clock)
+    // Get display width
+    static uint8_t lastSecond = 0xFF;
+    #if defined(LCD_4002)
+      const uint8_t displayWidth = 40;
+      const uint8_t halfWidth = 20;
+    #elif defined(LCD_2004) || defined(LCD_2002)
+      const uint8_t displayWidth = 20;
+      const uint8_t halfWidth = 10;
+    #else
+      const uint8_t displayWidth = 16;
+      const uint8_t halfWidth = 8;
+    #endif
+    
+    // Get audio levels
+    uint16_t vulevel = player.getVUlevel();
+    uint8_t L = map((vulevel >> 8) & 0xFF, 0, 255, 0, halfWidth);
+    uint8_t R = map(vulevel & 0xFF,         0, 255, 0, halfWidth);
+    
+    // Smooth fade
+    const uint8_t fadeRate = 2;
+    bool played = player.isRunning();
+    
+    if(played) {
+        _soundMeterMeasL = (L >= _soundMeterMeasL) ? L : (_soundMeterMeasL > fadeRate ? _soundMeterMeasL - fadeRate : 0);
+        _soundMeterMeasR = (R >= _soundMeterMeasR) ? R : (_soundMeterMeasR > fadeRate ? _soundMeterMeasR - fadeRate : 0);
+    } else {
+        if(_soundMeterMeasL > 0) _soundMeterMeasL = (_soundMeterMeasL > fadeRate) ? _soundMeterMeasL - fadeRate : 0;
+        if(_soundMeterMeasR > 0) _soundMeterMeasR = (_soundMeterMeasR > fadeRate) ? _soundMeterMeasR - fadeRate : 0;
+    }
+    
+    if(_soundMeterMeasL > halfWidth) _soundMeterMeasL = halfWidth;
+    if(_soundMeterMeasR > halfWidth) _soundMeterMeasR = halfWidth;
+    
+    // Build sound meter line based on display width
+    // Left channel: from left edge (0) towards center
+    // Right channel: from right edge towards center
+    #if defined(LCD_4002)
+      char line[41]; // 40 chars + null
+    #elif defined(LCD_2004) || defined(LCD_2002)
+      char line[21]; // 20 chars + null
+    #else
+      char line[17]; // 16 chars + null
+    #endif
+    
+    memset(line, ' ', displayWidth);
+    
+    // Fill left channel (from left)
+    for(uint8_t i = 0; i < _soundMeterMeasL; i++) {
+        line[i] = (char)0xFF; // Solid block character
+    }
+    
+    // Fill right channel (from right)
+    for(uint8_t i = 0; i < _soundMeterMeasR; i++) {
+        line[displayWidth - 1 - i] = (char)0xFF; // Solid block character
+    }
+    
+    line[displayWidth] = '\0';
+    
+    // Display on line 2
+    setCursor(0, 1);
+    print(line);
+    
+    // Also update clock periodically
+    if (network.timeinfo.tm_sec != lastSecond) {
+        lastSecond = network.timeinfo.tm_sec;
+        showSoundMeterClock(clockConf);
     }
 }
 

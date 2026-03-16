@@ -248,7 +248,7 @@ void NetServer::processQueue(){
                                   config.store.telnet,
                                   config.store.watchdog); 
                                   break;
-      case GETSCREEN:     sprintf (wsBuf, "{\"flip\":%d,\"inv\":%d,\"nump\":%d,\"tsf\":%d,\"tsd\":%d,\"dspon\":%d,\"br\":%d,\"con\":%d,\"scre\":%d,\"scrt\":%d,\"scrb\":%d,\"scrpe\":%d,\"scrpt\":%d,\"scrpb\":%d,\"lcdanim\":%d}", 
+      case GETSCREEN:     sprintf (wsBuf, "{\"flip\":%d,\"inv\":%d,\"nump\":%d,\"tsf\":%d,\"tsd\":%d,\"dspon\":%d,\"br\":%d,\"con\":%d,\"scre\":%d,\"scrt\":%d,\"scrb\":%d,\"scrpe\":%d,\"scrpt\":%d,\"scrpb\":%d,\"lcdanim\":%d,\"soundmeter\":%d}", 
                                   config.store.flipscreen, 
                                   config.store.invertdisplay, 
                                   config.store.numplaylist, 
@@ -263,7 +263,8 @@ void NetServer::processQueue(){
                                   config.store.screensaverPlayingEnabled,
                                   config.store.screensaverPlayingTimeout,
                                   config.store.screensaverPlayingBlank,
-                                  config.store.lcdAnimationType);
+                                  config.store.lcdAnimationType,
+                                  config.store.soundMeterEnabled);
                                   break;
       case GETTIMEZONE:   sprintf (wsBuf, "{\"tzh\":%d,\"tzm\":%d,\"sntp1\":\"%s\",\"sntp2\":\"%s\", \"timeint\":%d,\"timeintrtc\":%d}", 
                                   config.store.tzHour, 
@@ -294,7 +295,7 @@ void NetServer::processQueue(){
       case VOLUME:        sprintf (wsBuf, "{\"payload\":[{\"id\":\"volume\", \"value\": %d}]}", config.store.volume); telnet.printf("##CLI.VOL#: %d\n", config.store.volume); break;
       case NRSSI:         sprintf (wsBuf, "{\"payload\":[{\"id\":\"rssi\", \"value\": %d}, {\"id\":\"heap\", \"value\": %d}]}", rssi, (player.isRunning() && config.store.audioinfo)?(int)(100*player.inBufferFilled()/playerBufMax):0); /*rssi = 255;*/ break;
       case SDPOS:         sprintf (wsBuf, "{\"sdpos\": %lu,\"sdend\": %lu,\"sdtpos\": %lu,\"sdtend\": %lu}", 
-                                  player.getFilePos(), 
+                                  player.getAudioFilePosition(), 
                                   player.getFileSize(), 
                                   player.getAudioCurrentTime(), 
                                   player.getAudioFileDuration()); 
@@ -462,13 +463,14 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
   static int freeSpace = 0;
   if(request->url()=="/upload"){
     if (!index) {
-      if(filename!="tempwifi.csv"){
-        //player.sendCommand({PR_STOP, 0});
-        if(SPIFFS.exists(PLAYLIST_PATH)) SPIFFS.remove(PLAYLIST_PATH);
-        if(SPIFFS.exists(INDEX_PATH)) SPIFFS.remove(INDEX_PATH);
-        if(SPIFFS.exists(PLAYLIST_SD_PATH)) SPIFFS.remove(PLAYLIST_SD_PATH);
-        if(SPIFFS.exists(INDEX_SD_PATH)) SPIFFS.remove(INDEX_SD_PATH);
-      }
+      Serial.printf("[upload] start %s (target=%s)\n", filename.c_str(), filename.endsWith(".csv") ? "data" : "tmp");
+        if(filename.endsWith(".csv")){
+          //player.sendCommand({PR_STOP, 0});
+          if(SPIFFS.exists(PLAYLIST_PATH)) SPIFFS.remove(PLAYLIST_PATH);
+          if(SPIFFS.exists(INDEX_PATH)) SPIFFS.remove(INDEX_PATH);
+          if(SPIFFS.exists(PLAYLIST_SD_PATH)) SPIFFS.remove(PLAYLIST_SD_PATH);
+          if(SPIFFS.exists(INDEX_SD_PATH)) SPIFFS.remove(INDEX_SD_PATH);
+        }
       freeSpace = (float)SPIFFS.totalBytes()/100*68-SPIFFS.usedBytes();
       request->_tempFile = SPIFFS.open(TMP_PATH , "w");
     }else{
@@ -480,6 +482,7 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
       }
     }
     if (final) {
+      Serial.printf("[upload] finished %s (%u bytes)\n", filename.c_str(), index + len);
       request->_tempFile.close();
       freeSpace = 0;
     }

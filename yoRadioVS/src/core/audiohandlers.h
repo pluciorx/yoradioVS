@@ -5,122 +5,128 @@
 //              Audio handlers                 //
 //=============================================//
 
-void audio_info(const char *info) {
-  if(player.lockOutput) return;
-  if(config.store.audioinfo) telnet.printf("##AUDIO.INFO#: %s\n", info);
-  #ifdef USE_NEXTION
-    nextion.audioinfo(info);
-  #endif
-  if (strstr(info, "format is aac")  != NULL) { config.setBitrateFormat(BF_AAC); display.putRequest(DBITRATE); }
-  if (strstr(info, "format is flac") != NULL) { config.setBitrateFormat(BF_FLAC); display.putRequest(DBITRATE); }
-  if (strstr(info, "format is mp3")  != NULL) { config.setBitrateFormat(BF_MP3); display.putRequest(DBITRATE); }
-  if (strstr(info, "format is wav")  != NULL) { config.setBitrateFormat(BF_WAV); display.putRequest(DBITRATE); }
-  if (strstr(info, "skip metadata") != NULL) config.setTitle(config.station.name);
-  if (strstr(info, "Account already in use") != NULL || strstr(info, "HTTP/1.0 401") != NULL) {
-    player.setError(info);
-    
-  }
-  char* ici; char b[20]={0};
-  if ((ici = strstr(info, "BitRate: ")) != NULL) {
-    strlcpy(b, ici + 9, 50);
-    audio_bitrate(b);
-  }
-}
-
-void audio_bitrate(const char *info)
-{
-  if(config.store.audioinfo) telnet.printf("%s %s\n", "##AUDIO.BITRATE#:", info);
-  config.station.bitrate = atoi(info) / 1000;
-  display.putRequest(DBITRATE);
-  #ifdef USE_NEXTION
-    nextion.bitrate(config.station.bitrate);
-  #endif
-  netserver.requestOnChange(BITRATE, 0);
-}
-
 bool printable(const char *info) {
   if(L10N_LANGUAGE!=RU) return true;
   bool p = true;
-  for (int c = 0; c < strlen(info); c++)
-  {
+  for (int c = 0; c < strlen(info); c++) {
     if ((uint8_t)info[c] > 0x7e || (uint8_t)info[c] < 0x20) p = false;
   }
   if (!p) p = (uint8_t)info[0] >= 0xC2 && (uint8_t)info[1] >= 0x80 && (uint8_t)info[1] <= 0xBF;
   return p;
 }
 
-void audio_showstation(const char *info) {
-  bool p = printable(info) && (strlen(info) > 0);(void)p;
-  if(player.remoteStationName){
-    config.setStation(p?info:config.station.name);
-    display.putRequest(NEWSTATION);
-    netserver.requestOnChange(STATION, 0);
-  }
-}
+void registerAudioCallbacks() {
+#if I2S_DOUT!=255 || I2S_INTERNAL
+  Audio::audio_info_callback = [](Audio::msg_t i) {
+    switch (i.e) {
 
-void audio_showstreamtitle(const char *info) {
-  if (strstr(info, "Account already in use") != NULL || strstr(info, "HTTP/1.0 401") != NULL || strstr(info, "HTTP/1.1 401") != NULL) player.setError(info);
-  bool p = printable(info) && (strlen(info) > 0);
-  #ifdef DEBUG_TITLES
-    config.setTitle(DEBUG_TITLES);
-  #else
-    config.setTitle(p?info:config.station.name);
-  #endif
-}
+      case Audio::evt_info: {
+        const char* info = i.msg;
+        if (!info) break;
+        if (player.lockOutput) break;
+        if (config.store.audioinfo) telnet.printf("##AUDIO.INFO#: %s\n", info);
+        #ifdef USE_NEXTION
+          nextion.audioinfo(info);
+        #endif
+        if (strstr(info, "format is aac")  != NULL) { config.setBitrateFormat(BF_AAC);  display.putRequest(DBITRATE); }
+        if (strstr(info, "format is flac") != NULL) { config.setBitrateFormat(BF_FLAC); display.putRequest(DBITRATE); }
+        if (strstr(info, "format is mp3")  != NULL) { config.setBitrateFormat(BF_MP3);  display.putRequest(DBITRATE); }
+        if (strstr(info, "format is wav")  != NULL) { config.setBitrateFormat(BF_WAV);  display.putRequest(DBITRATE); }
+        if (strstr(info, "skip metadata")  != NULL) config.setTitle(config.station.name);
+        if (strstr(info, "Account already in use") != NULL || strstr(info, "HTTP/1.0 401") != NULL) {
+          player.setError(info);
+        }
+        break;
+      }
 
-void audio_error(const char *info) {
-  player.setError(info);
-}
+      case Audio::evt_bitrate: {
+        // i.arg1 = bitrate in bps (number extracted from msg by library)
+        if (config.store.audioinfo) telnet.printf("##AUDIO.BITRATE#: %s\n", i.msg ? i.msg : "");
+        config.station.bitrate = (i.arg1 > 0) ? (i.arg1 / 1000) : (i.msg ? atoi(i.msg) / 1000 : 0);
+        display.putRequest(DBITRATE);
+        #ifdef USE_NEXTION
+          nextion.bitrate(config.station.bitrate);
+        #endif
+        netserver.requestOnChange(BITRATE, 0);
+        break;
+      }
 
-void audio_id3artist(const char *info){
-  if(printable(info)) config.setStation(info);
-  display.putRequest(NEWSTATION);
-  netserver.requestOnChange(STATION, 0);
-}
+      case Audio::evt_streamtitle: {
+        const char* info = i.msg;
+        if (!info) break;
+        if (strstr(info, "Account already in use") != NULL ||
+            strstr(info, "HTTP/1.0 401") != NULL ||
+            strstr(info, "HTTP/1.1 401") != NULL) {
+          player.setError(info);
+          break;
+        }
+        bool p = printable(info) && (strlen(info) > 0);
+        #ifdef DEBUG_TITLES
+          config.setTitle(DEBUG_TITLES);
+        #else
+          config.setTitle(p ? info : config.station.name);
+        #endif
+        break;
+      }
 
-void audio_id3album(const char *info){
-  if(player.lockOutput) return;
-  if(printable(info)){
-    if(strlen(config.station.title)==0){
-      config.setTitle(info);
-    }else{
-      char tmp[BUFLEN+3];
-      snprintf(tmp, BUFLEN+3, "%s - %s", config.station.title, info);
-      config.setTitle(tmp);
+      case Audio::evt_name: {
+        const char* info = i.msg;
+        if (!info) break;
+        bool p = printable(info) && (strlen(info) > 0);
+        if (player.remoteStationName) {
+          config.setStation(p ? info : config.station.name);
+          display.putRequest(NEWSTATION);
+          netserver.requestOnChange(STATION, 0);
+        }
+        break;
+      }
+
+      case Audio::evt_id3data: {
+        if (player.lockOutput) break;
+        if (i.msg) telnet.printf("##AUDIO.ID3#: %s\n", i.msg);
+        if (printable(info)) {
+            if (strlen(config.station.title) == 0) {
+                config.setTitle(info);
+            }
+            else {
+                char tmp[BUFLEN + 3];
+                snprintf(tmp, BUFLEN + 3, "%s - %s", config.station.title, info);
+                config.setTitle(tmp);
+            }
+        break;
+      }
+
+      case Audio::evt_eof: {
+        config.sdResumePos = 0;
+        player.next();
+        break;
+      }
+
+      default:
+        break;
     }
-  }
+  };
+#endif
 }
 
-void audio_id3title(const char *info){
-  audio_id3album(info);
-}
+// ---------- Free functions still used by the player/SD path ----------
 
-void audio_beginSDread(){
+void audio_beginSDread() {
   config.setTitle("");
 }
 
-void audio_id3data(const char *info){  //id3 metadata
-    if(player.lockOutput) return;
-    telnet.printf("##AUDIO.ID3#: %s\n", info);
-}
-
-void audio_eof_mp3(const char *info){  //end of file
-    config.sdResumePos = 0;
-    player.next();
-}
-
-void audio_eof_stream(const char *info){
+void audio_eof_stream(const char *info) {
   player.sendCommand({PR_STOP, 0});
-  if(!player.resumeAfterUrl) return;
-  if (config.getMode()==PM_WEB){
+  if (!player.resumeAfterUrl) return;
+  if (config.getMode() == PM_WEB) {
     player.sendCommand({PR_PLAY, config.lastStation()});
-  }else{
-    player.setResumeFilePos( config.sdResumePos==0?0:config.sdResumePos-player.sd_min);
+  } else {
+    player.setResumeFilePos(config.sdResumePos == 0 ? 0 : config.sdResumePos - player.sd_min);
     player.sendCommand({PR_PLAY, config.lastStation()});
   }
 }
 
-void audio_progress(uint32_t startpos, uint32_t endpos){
+void audio_progress(uint32_t startpos, uint32_t endpos) {
   player.sd_min = startpos;
   player.sd_max = endpos;
   netserver.requestOnChange(SDLEN, 0);

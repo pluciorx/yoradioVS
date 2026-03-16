@@ -47,9 +47,9 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 //#define I2C_RST           -1                /*  I2C RST pin. Set to -1 if not used  */
 
 /*        I2S DAC                 */
-#define I2S_DOUT          D8                /*  DIN connection. Should be set to 255 if the board is not used */
-#define I2S_BCLK          D7                /*  BCLK Bit clock */
-#define I2S_LRC           D9                /*  WSEL Left Right Clock */
+#define I2S_DOUT          10                /*  DIN connection. Should be set to 255 if the board is not used */
+#define I2S_BCLK          11                /*  BCLK Bit clock */
+#define I2S_LRC           12                /*  WSEL Left Right Clock */
 /******************************************/
 
 /*  VS1053 VSPI PINS. VS1053 SCK must be connected to pin 18
@@ -66,10 +66,10 @@ The connection tables are located here https://github.com/e2002/yoradio#connecti
 /******************************************/
 
 /*  ENCODER  */
-//#define ENC_BTNL              255           /*  Left rotation */
-//#define ENC_BTNB              255           /*  Encoder button */
-//#define ENC_BTNR              255           /*  Right rotation */
-//#define ENC_INTERNALPULLUP    true          /*  Enable the weak pull up resistors */
+//#define ENC_BTNL              A6           /*  Left rotation */
+//#define ENC_BTNB              A3           /*  Encoder button */
+//#define ENC_BTNR              A7           /*  Right rotation */
+//#define ENC_INTERNALPULLUP    false          /*  Enable the weak pull up resistors */
 //#define ENC_HALFQUARD         true          /*  Experiment  with it */
 /******************************************/
 

@@ -31,7 +31,7 @@ QueueHandle_t playerQueue;
   #if !I2S_INTERNAL
     Player::Player() {}
   #else
-    Player::Player(): Audio(true, I2S_DAC_CHANNEL_BOTH_EN)  {}
+    Player::Player(): Audio(I2S_NUM_0)  {}
   #endif
 #endif
 
@@ -98,7 +98,7 @@ void Player::setError(const char *e){
 
 void Player::_stop(bool alreadyStopped){
   log_i("%s called", __func__);
-  if(config.getMode()==PM_SDCARD && !alreadyStopped) config.sdResumePos = player.getFilePos();
+  if(config.getMode()==PM_SDCARD && !alreadyStopped) config.sdResumePos = player.getAudioFilePosition();
   _status = STOPPED;
   setOutputPins(false);
   if(!_hasError) config.setTitle((display.mode()==LOST || display.mode()==UPDATING)?"":LANG::const_PlStopped);
@@ -107,13 +107,10 @@ void Player::_stop(bool alreadyStopped){
   #ifdef USE_NEXTION
     nextion.bitrate(config.station.bitrate);
   #endif
-  setDefaults();
   if(!alreadyStopped) stopSong();
   netserver.requestOnChange(BITRATE, 0);
   display.putRequest(DBITRATE);
   display.putRequest(PSTOP);
-  //setDefaults();
-  //if(!alreadyStopped) stopSong();
   if(!lockOutput) stopInfo();
   if (player_on_stop_play) player_on_stop_play();
   pm.on_stop_play();
@@ -122,11 +119,7 @@ void Player::_stop(bool alreadyStopped){
 void Player::initHeaders(const char *file) {
   if(strlen(file)==0 || true) return; //TODO Read TAGs
   connecttoFS(sdman,file);
-  eofHeader = false;
-  while(!eofHeader) Audio::loop();
-  //netserver.requestOnChange(SDPOS, 0);
-  setDefaults();
-}
+} 
 void resetPlayer(){
   if(!config.store.watchdog) return;
   player.resetQueue();
@@ -216,7 +209,7 @@ void Player::setOutputPins(bool isPlaying) {
 void Player::_play(uint16_t stationId) {
   log_i("%s called, stationId=%d", __func__, stationId);
   _hasError=false;
-  setDefaults();
+  stopSong();
   _status = STOPPED;
   setOutputPins(false);
   remoteStationName = false;
