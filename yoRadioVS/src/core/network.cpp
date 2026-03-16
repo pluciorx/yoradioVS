@@ -13,7 +13,7 @@
 #include "../pluginsManager/pluginsManager.h"
 
 #ifndef WIFI_ATTEMPTS
-  #define WIFI_ATTEMPTS  16
+  #define WIFI_ATTEMPTS  25
 #endif
 
 #ifndef SEARCH_WIFI_CORE_ID
@@ -65,8 +65,8 @@ bool MyNetwork::wifiBegin(bool silent){
       Serial.print("##[BOOT]#\t");
       display.putRequest(BOOTSTRING, ls);
     }
-    //WiFi.disconnect(true, true); //disconnect & erase internal credentials https://github.com/e2002/yoradio/pull/164/commits/89d8b4450dde99cd7930b84bb14d81dab920b879
-    //delay(100);
+    WiFi.disconnect(true, true); //disconnect & erase internal credentials https://github.com/e2002/yoradio/pull/164/commits/89d8b4450dde99cd7930b84bb14d81dab920b879
+    delay(100);
     WiFi.mode(WIFI_STA);
     WiFi.begin(config.ssids[ls].ssid, config.ssids[ls].password);
     while (WiFi.status() != WL_CONNECTED) {

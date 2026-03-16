@@ -2,7 +2,7 @@
 #define player_h
 
 #if I2S_DOUT!=255 || I2S_INTERNAL
-  #include "../audioI2S/AudioEx.h"
+  #include "../audioI2S/Audio.h"
 #else
   #include "../audioVS1053/audioVS1053Ex.h"
 #endif

@@ -66,8 +66,8 @@ class DspCore: public yoDisplay {
       void updateScreensaver();
       void showAnimationFrame(const AnimFrame* frame);
       // Sound meter methods
-      void showSoundMeterClock();
-      void updateSoundMeter();
+      void updateSoundMeter();  
+      void showSoundMeterClock(const WidgetConfig& config);  
     #endif
     void flip();
     void invert();

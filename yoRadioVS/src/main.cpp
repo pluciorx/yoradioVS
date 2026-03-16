@@ -29,6 +29,7 @@ SPIClass  SPI2(HSPI);
 #endif
 
 extern __attribute__((weak)) void yoradio_on_setup();
+void registerAudioCallbacks();    // <-- add this forward declaration
 
 #if USE_OTA
 void setupOTA(){
@@ -76,6 +77,7 @@ void setup() {
   config.init();
   display.init();
   player.init();
+  registerAudioCallbacks();   
   network.begin();
   if (network.status != CONNECTED && network.status!=SDREADY) {
     netserver.begin();

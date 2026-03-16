@@ -295,7 +295,7 @@ void NetServer::processQueue(){
       case VOLUME:        sprintf (wsBuf, "{\"payload\":[{\"id\":\"volume\", \"value\": %d}]}", config.store.volume); telnet.printf("##CLI.VOL#: %d\n", config.store.volume); break;
       case NRSSI:         sprintf (wsBuf, "{\"payload\":[{\"id\":\"rssi\", \"value\": %d}, {\"id\":\"heap\", \"value\": %d}]}", rssi, (player.isRunning() && config.store.audioinfo)?(int)(100*player.inBufferFilled()/playerBufMax):0); /*rssi = 255;*/ break;
       case SDPOS:         sprintf (wsBuf, "{\"sdpos\": %lu,\"sdend\": %lu,\"sdtpos\": %lu,\"sdtend\": %lu}", 
-                                  player.getFilePos(), 
+                                  player.getAudioFilePosition(), 
                                   player.getFileSize(), 
                                   player.getAudioCurrentTime(), 
                                   player.getAudioFileDuration()); 
@@ -463,13 +463,14 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
   static int freeSpace = 0;
   if(request->url()=="/upload"){
     if (!index) {
-      if(filename!="tempwifi.csv"){
-        //player.sendCommand({PR_STOP, 0});
-        if(SPIFFS.exists(PLAYLIST_PATH)) SPIFFS.remove(PLAYLIST_PATH);
-        if(SPIFFS.exists(INDEX_PATH)) SPIFFS.remove(INDEX_PATH);
-        if(SPIFFS.exists(PLAYLIST_SD_PATH)) SPIFFS.remove(PLAYLIST_SD_PATH);
-        if(SPIFFS.exists(INDEX_SD_PATH)) SPIFFS.remove(INDEX_SD_PATH);
-      }
+      Serial.printf("[upload] start %s (target=%s)\n", filename.c_str(), filename.endsWith(".csv") ? "data" : "tmp");
+        if(filename.endsWith(".csv")){
+          //player.sendCommand({PR_STOP, 0});
+          if(SPIFFS.exists(PLAYLIST_PATH)) SPIFFS.remove(PLAYLIST_PATH);
+          if(SPIFFS.exists(INDEX_PATH)) SPIFFS.remove(INDEX_PATH);
+          if(SPIFFS.exists(PLAYLIST_SD_PATH)) SPIFFS.remove(PLAYLIST_SD_PATH);
+          if(SPIFFS.exists(INDEX_SD_PATH)) SPIFFS.remove(INDEX_SD_PATH);
+        }
       freeSpace = (float)SPIFFS.totalBytes()/100*68-SPIFFS.usedBytes();
       request->_tempFile = SPIFFS.open(TMP_PATH , "w");
     }else{
@@ -481,6 +482,7 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
       }
     }
     if (final) {
+      Serial.printf("[upload] finished %s (%u bytes)\n", filename.c_str(), index + len);
       request->_tempFile.close();
       freeSpace = 0;
     }

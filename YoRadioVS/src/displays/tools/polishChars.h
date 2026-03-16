@@ -7,7 +7,7 @@
 // LCD custom char slots: 0-7 (we have 8 slots available)
 
 // Lowercase Polish characters
-const byte char_a_ogonek[8] = {  // ą (slot 0)
+const uint8_t char_a_ogonek[8] = {  // ą (slot 0)
   0b01110,
   0b00001,
   0b01111,
@@ -18,7 +18,7 @@ const byte char_a_ogonek[8] = {  // ą (slot 0)
   0b00000
 };
 
-const byte char_c_acute[8] = {   // ć (slot 1)
+const uint8_t char_c_acute[8] = {   // ć (slot 1)
   0b00100,
   0b01000,
   0b01110,
@@ -29,7 +29,7 @@ const byte char_c_acute[8] = {   // ć (slot 1)
   0b00000
 };
 
-const byte char_e_ogonek[8] = {  // ę (slot 2)
+const uint8_t char_e_ogonek[8] = {  // ę (slot 2)
   0b01110,
   0b10001,
   0b11111,
@@ -40,7 +40,7 @@ const byte char_e_ogonek[8] = {  // ę (slot 2)
   0b00000
 };
 
-const byte char_l_stroke[8] = {  // ł (slot 3)
+const uint8_t char_l_stroke[8] = {  // ł (slot 3)
   0b01100,
   0b00100,
   0b01110,
@@ -51,7 +51,7 @@ const byte char_l_stroke[8] = {  // ł (slot 3)
   0b00000
 };
 
-const byte char_n_acute[8] = {   // ń (slot 4)
+const uint8_t char_n_acute[8] = {   // ń (slot 4)
   0b00100,
   0b01000,
   0b10110,
@@ -62,7 +62,7 @@ const byte char_n_acute[8] = {   // ń (slot 4)
   0b00000
 };
 
-const byte char_o_acute[8] = {   // ó (slot 5)
+const uint8_t char_o_acute[8] = {   // ó (slot 5)
   0b00100,
   0b01000,
   0b01110,
@@ -73,7 +73,7 @@ const byte char_o_acute[8] = {   // ó (slot 5)
   0b00000
 };
 
-const byte char_s_acute[8] = {   // ś (slot 6)
+const uint8_t char_s_acute[8] = {   // ś (slot 6)
   0b00100,
   0b01000,
   0b01111,
@@ -84,7 +84,7 @@ const byte char_s_acute[8] = {   // ś (slot 6)
   0b00000
 };
 
-const byte char_z_dot[8] = {     // ż (slot 7)
+const uint8_t char_z_dot[8] = {     // ż (slot 7)
   0b00100,
   0b00000,
   0b11111,

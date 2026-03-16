@@ -271,6 +271,10 @@ void Config::configPostPlaying(uint16_t stationId){
     saveValue(&store.lastSdStation, stationId);
   }
   if(store.smartstart!=2) setSmartStart(1);
+
+  // Clear any "[connecting]" text once playback has started
+  setTitle("");
+
   netserver.requestOnChange(MODE, 0);
   //display.putRequest(NEWMODE, PLAYER);
   display.putRequest(PSTART);
@@ -476,7 +480,7 @@ void Config::setSDpos(uint32_t val){
       player.setResumeFilePos(val-player.sd_min);
       player.sendCommand({PR_PLAY, config.store.lastSdStation});
     }else{
-      player.setFilePos(val-player.sd_min);
+      player.setAudioFilePosition(val-player.sd_min);
     }
   }
 }

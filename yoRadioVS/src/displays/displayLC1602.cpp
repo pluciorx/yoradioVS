@@ -7,6 +7,7 @@
 #include "../core/player.h"
 #include "animations.h"
 #include "tools/commongfx.h"
+#include "conf/displayLCD1602conf.h"
 
 #if L10N_LANGUAGE == PL
 #include "tools/polishChars.h"
@@ -254,9 +255,9 @@ void DspCore::initScreensaver(AnimationType type) {
         if (!config.store.vumeter) {
             config.store.vumeter = true;
         }
-        
+		
         // Show clock on line 1
-        showSoundMeterClock();
+        showSoundMeterClock(clockConf);
         // Clear line 2 for sound meter
         setCursor(0, 1);
         #if defined(LCD_4002)
@@ -293,44 +294,48 @@ void DspCore::updateScreensaver() {
     }
 }
 
-void DspCore::showSoundMeterClock() {
-    // Show time on line 1 (centered)
+void DspCore::showSoundMeterClock(const WidgetConfig& config) {
+    // Format time string
     char timeBuf[6]; // HH:MM + null terminator
     strftime(timeBuf, sizeof(timeBuf), "%H:%M", &network.timeinfo);
-    
-    #if defined(LCD_4002)
-      // Center on 40 char display
-      char line[41];
-      const int padding = (40 - strlen(timeBuf)) / 2;
-      memset(line, ' ', 40);
-      memcpy(line + padding, timeBuf, strlen(timeBuf));
-      line[40] = '\0';
-      setCursor(0, 0);
-      print(line);
-    #elif defined(LCD_2004) || defined(LCD_2002)
-      // Center on 20 char display
-      char line[21];
-      const int padding = (20 - strlen(timeBuf)) / 2;
-      memset(line, ' ', 20);
-      memcpy(line + padding, timeBuf, strlen(timeBuf));
-      line[20] = '\0';
-      setCursor(0, 0);
-      print(line);
-    #else
-      // Center on 16 char display
-      char line[17];
-      const int padding = (16 - strlen(timeBuf)) / 2;
-      memset(line, ' ', 16);
-      memcpy(line + padding, timeBuf, strlen(timeBuf));
-      line[16] = '\0';
-      setCursor(0, 0);
-      print(line);
-    #endif
+
+    uint16_t displayWidth = width();
+    char line[41]; // Max 40 chars + null
+    memset(line, ' ', displayWidth);
+    line[displayWidth] = '\0';
+
+    int timeLen = strlen(timeBuf);
+    int pos = 0;
+
+    // Calculate position based on alignment
+    switch (config.align) {
+    case WA_LEFT:
+        pos = config.left;
+        break;
+    case WA_CENTER:
+        pos = (displayWidth - timeLen) / 2;
+        break;
+    case WA_RIGHT:
+        pos = displayWidth - timeLen - config.left;
+        break;
+    }
+
+    // Ensure position is within bounds
+    if (pos < 0) pos = 0;
+    if (pos + timeLen > displayWidth) pos = displayWidth - timeLen;
+
+    // Copy time into position
+    memcpy(line + pos, timeBuf, timeLen);
+
+    // Display on specified row
+    setCursor(0, config.top);
+    print(line);
 }
 
 void DspCore::updateSoundMeter() {
     // Update sound meter on line 2 (line 1 has the clock)
     // Get display width
+    static uint8_t lastSecond = 0xFF;
     #if defined(LCD_4002)
       const uint8_t displayWidth = 40;
       const uint8_t halfWidth = 20;
@@ -343,9 +348,9 @@ void DspCore::updateSoundMeter() {
     #endif
     
     // Get audio levels
-    uint16_t vulevel = player.get_VUlevel(halfWidth);
-    uint8_t L = (vulevel >> 8) & 0xFF;
-    uint8_t R = vulevel & 0xFF;
+    uint16_t vulevel = player.getVUlevel();
+    uint8_t L = map((vulevel >> 8) & 0xFF, 0, 255, 0, halfWidth);
+    uint8_t R = map(vulevel & 0xFF,         0, 255, 0, halfWidth);
     
     // Smooth fade
     const uint8_t fadeRate = 2;
@@ -392,7 +397,10 @@ void DspCore::updateSoundMeter() {
     print(line);
     
     // Also update clock periodically
-    showSoundMeterClock();
+    if (network.timeinfo.tm_sec != lastSecond) {
+        lastSecond = network.timeinfo.tm_sec;
+        showSoundMeterClock(clockConf);
+    }
 }
 
 #endif
