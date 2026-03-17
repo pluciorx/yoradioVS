@@ -443,6 +443,9 @@ void Config::setScreensaverPlayingBlank(bool val){
 void Config::setLcdAnimationType(uint8_t val) {
     
     saveValue(&store.lcdAnimationType, val);
+#ifndef DSP_LCD
+    display.putRequest(NEWMODE, PLAYER);
+#endif
 }
 
 void Config::setSoundMeterEnabled(bool val) {

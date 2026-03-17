@@ -28,11 +28,39 @@ void registerAudioCallbacks() {
         #ifdef USE_NEXTION
           nextion.audioinfo(info);
         #endif
-        if (strstr(info, "format is aac")  != NULL) { config.setBitrateFormat(BF_AAC);  display.putRequest(DBITRATE); }
-        if (strstr(info, "format is flac") != NULL) { config.setBitrateFormat(BF_FLAC); display.putRequest(DBITRATE); }
-        if (strstr(info, "format is mp3")  != NULL) { config.setBitrateFormat(BF_MP3);  display.putRequest(DBITRATE); }
-        if (strstr(info, "format is wav")  != NULL) { config.setBitrateFormat(BF_WAV);  display.putRequest(DBITRATE); }
-        if (strstr(info, "skip metadata")  != NULL) config.setTitle(config.station.name);
+          if (strstr(info, "MPEG-1 Layer III") != nullptr) {
+              config.setBitrateFormat(BF_MP3);
+              display.putRequest(DBITRATE);
+          }
+          else if (strstr(info, "AAC") != nullptr) {
+              config.setBitrateFormat(BF_AAC);
+              display.putRequest(DBITRATE);
+          }
+          else if (strstr(info, "FLAC") != nullptr) {
+              config.setBitrateFormat(BF_FLAC);
+              display.putRequest(DBITRATE);
+          }
+          else if (strstr(info, "WAV") != nullptr) {
+              config.setBitrateFormat(BF_WAV);
+              display.putRequest(DBITRATE);
+          }
+          else if (strstr(info, "OGG") != nullptr || strstr(info, "VORBIS") != nullptr) {
+              config.setBitrateFormat(BF_OGG);
+              display.putRequest(DBITRATE);
+          }
+          else if (strstr(info, "OPUS") != nullptr) {
+              config.setBitrateFormat(BF_OPU);
+              display.putRequest(DBITRATE);
+          }
+
+          if (strstr(info, "skip metadata") != nullptr) {
+              if (config.station.name[0] == '.') {
+                  config.setTitle(config.station.name + 1);
+              }
+              else {
+                  config.setTitle(config.station.name);
+              }
+          }
         if (strstr(info, "Account already in use") != NULL || strstr(info, "HTTP/1.0 401") != NULL) {
           player.setError(info);
         }
@@ -42,11 +70,21 @@ void registerAudioCallbacks() {
       case Audio::evt_bitrate: {
         // i.arg1 = bitrate in bps (number extracted from msg by library)
         if (config.store.audioinfo) telnet.printf("##AUDIO.BITRATE#: %s\n", i.msg ? i.msg : "");
-        config.station.bitrate = (i.arg1 > 0) ? (i.arg1 / 1000) : (i.msg ? atoi(i.msg) / 1000 : 0);
+        if (!i.msg) {
+            return;
+        }
+        if (config.store.audioinfo) {
+            // Itt lehetne plusz log, ha szükséges
+        }
+        uint32_t br = static_cast<uint32_t>(atoi(i.msg));
+        if (br > 3000) {
+            br = br / 1000;
+        }
+        config.station.bitrate = br;
         display.putRequest(DBITRATE);
-        #ifdef USE_NEXTION
-          nextion.bitrate(config.station.bitrate);
-        #endif
+#ifdef USE_NEXTION
+        nextion.bitrate(config.station.bitrate);
+#endif
         netserver.requestOnChange(BITRATE, 0);
         break;
       }
@@ -84,15 +122,16 @@ void registerAudioCallbacks() {
       case Audio::evt_id3data: {
         if (player.lockOutput) break;
         if (i.msg) telnet.printf("##AUDIO.ID3#: %s\n", i.msg);
-        if (printable(info)) {
+        if (printable(i.msg)) {
             if (strlen(config.station.title) == 0) {
-                config.setTitle(info);
+                config.setTitle(i.msg);
             }
             else {
                 char tmp[BUFLEN + 3];
-                snprintf(tmp, BUFLEN + 3, "%s - %s", config.station.title, info);
+                snprintf(tmp, BUFLEN + 3, "%s - %s", config.station.title, i.msg);
                 config.setTitle(tmp);
             }
+        }
         break;
       }
 
@@ -131,5 +170,7 @@ void audio_progress(uint32_t startpos, uint32_t endpos) {
   player.sd_max = endpos;
   netserver.requestOnChange(SDLEN, 0);
 }
+
+
 
 #endif
