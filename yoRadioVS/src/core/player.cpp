@@ -51,6 +51,7 @@ void Player::init() {
   #if I2S_DOUT!=255
     #if !I2S_INTERNAL
       setPinout(I2S_BCLK, I2S_LRC, I2S_DOUT);
+      setVolumeSteps(254);  // extend I2S volume range from default 21 to full 0..254
     #endif
   #else
     SPI.begin();
@@ -155,6 +156,7 @@ void Player::loop() {
       case PR_VOL: {
         config.setVolume(requestP.payload);
         Audio::setVolume(volToI2S(requestP.payload));
+		
         break;
       }
       #ifdef USE_SD
@@ -308,10 +310,12 @@ void Player::stepVol(bool up) {
 }
 
 uint8_t Player::volToI2S(uint8_t volume) {
-  int vol = map(volume, 0, 254 - config.station.ovol * 3 , 0, 254);
-  if (vol > 254) vol = 254;
-  if (vol < 0) vol = 0;
-  return vol;
+    int maxOut = 254 - config.station.ovol * 3;
+    if (maxOut < 0) maxOut = 0;
+    int vol = (volume * maxOut) / 254;
+    if (vol > 254) vol = 254;
+    if (vol < 0) vol = 0;
+    return (uint8_t)vol;
 }
 
 void Player::_loadVol(uint8_t volume) {

@@ -74,7 +74,7 @@ bool NetServer::begin(bool quiet) {
   if(!quiet) Serial.print("##[BOOT]#\tnetserver.begin\t");
   importRequest = IMDONE;
   irRecordEnable = false;
-  playerBufMax = psramInit()?300000:1600 * config.store.abuff;
+  playerBufMax = psramInit() ? 300000:1600 * config.store.abuff;
   nsQueue = xQueueCreate( 20, sizeof( nsRequestParams_t ) );
   while(nsQueue==NULL){;}
 
@@ -185,9 +185,12 @@ void NetServer::processQueue(){
           //String act = F("\"group_wifi\",");
           nsBuf[0]='\0';
           APPEND_GROUP("group_wifi");
+        
           if (network.status == CONNECTED) {
-                                                                //act += F("\"group_system\",");
-                                                                APPEND_GROUP("group_system");
+              //act += F("\"group_system\",");
+              APPEND_GROUP("group_system");
+
+                                                                
             if (BRIGHTNESS_PIN != 255 || DSP_CAN_FLIPPED || DSP_MODEL == DSP_NOKIA5110 || dbgact)    APPEND_GROUP("group_display");
           #ifdef USE_NEXTION
                                                                 APPEND_GROUP("group_nextion");
@@ -601,7 +604,7 @@ void handleNotFound(AsyncWebServerRequest * request) {
   }
   if (request->url() == "/variables.js") {
     sprintf (netserver.nsBuf, "var yoVersion='%s';\nvar formAction='%s';\nvar playMode='%s';\n", YOVERSION, (network.status == CONNECTED && !config.emptyFS)?"webboard":"", (network.status == CONNECTED)?"player":"ap");
-    request->send(200, "text/html", netserver.nsBuf);
+    request->send(200, "text/javascript", netserver.nsBuf);
     return;
   }
   if (strcmp(request->url().c_str(), "/settings.html") == 0 || strcmp(request->url().c_str(), "/update.html") == 0 || strcmp(request->url().c_str(), "/ir.html") == 0){

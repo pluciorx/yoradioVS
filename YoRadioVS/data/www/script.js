@@ -143,20 +143,34 @@ function onMessage(event) {
         setupElement(key, data[key]);
       });
     }
-  }catch(e){
+  }catch(e)
+  {
     console.log("ws.onMessage error:", event.data);
+    console.log(e);
+    
   }
 }
 function escapeData(data){
-  let m=data.match(/{.+?:\s"(.+?)"}/);
-  if(m!==null){
-    let m1 = m[1];
-    if(m1.indexOf('"') !== -1){
-      let mq=m1.replace(/["]/g, '\\\"');
-      return data.replace(m1,mq);
+  // Fast attempt: if data is already valid JSON, return it unchanged
+  try {
+    JSON.parse(data);
+    return data;
+  } catch (e) {
+    // If parsing failed, try to escape raw control characters (LF/CR/TAB)
+    // inside all JSON string literals. This fixes cases where the server
+    // sends unescaped newlines inside quoted values.
+    try {
+      const fixed = data.replace(/"((?:\\.|[^"\\])*)"/gs, (match, content) => {
+        const replaced = content.replace(/\r/g, "\\r").replace(/\n/g, "\\n").replace(/\t/g, "\\t");
+        if (replaced === content) return match;
+        return `"${replaced}"`;
+      });
+      return fixed;
+    } catch (e2) {
+      // If anything goes wrong, return original data and let caller log the error
+      return data;
     }
   }
-  return data;
 }
 function getId(id,patent=document){
   return patent.getElementById(id);
@@ -221,7 +235,7 @@ function setupElement(id,value){
     }
   }
 }
-/***--- playlist ---***/
+///***--- playlist ---***///
 function setCurrentItem(item){
   currentItem=item;
   const playlist = getId("playlist");
@@ -680,6 +694,26 @@ function continueLoading(mode){
       else websocket.send(`${command}=${target.value}`);       //<-- other
       event.preventDefault(); event.stopPropagation();
     }
+  });
+  // Also handle 'change' events for controls that emit change (selects, etc.)
+  document.body.addEventListener('change', (event) => {
+    let target = event.target;
+    let command = target.dataset.command;
+    if (!command) {
+      if (target.parentElement) {
+        command = target.parentElement.dataset.command;
+        if (command) target = target.parentElement;
+      }
+    }
+    if (!command) return;
+    // ignore local-handled controls
+    if (target.classList.contains('local')) return;
+    if (target.type === 'range') {
+      sliderInput(target, command);
+    } else {
+      websocket.send(`${command}=${target.value}`);
+    }
+    event.preventDefault(); event.stopPropagation();
   });
   document.body.addEventListener('mousewheel', (event) => {
     const target = event.target;
