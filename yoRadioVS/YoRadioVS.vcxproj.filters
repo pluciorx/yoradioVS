@@ -32,7 +32,6 @@
     <None Include="data\www\style.css" />
     <None Include="data\www\updform.html" />
     <None Include="data\www\bg.js" />
-    <None Include="sdkconfig.defaults" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="YoRadioVS.ino" />
@@ -556,6 +555,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\audioI2S\wav_decoder\wav_decoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MPR121Touch\src\MPR121Touch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\userdefine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1281,6 +1286,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\audioI2S\wav_decoder\wav_decoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MPR121Touch\src\MPR121Touch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\userdefine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
