@@ -64,7 +64,6 @@ class Player: public Audio {
     void toggle();
     void stepVol(bool up);
     void setVol(uint8_t volume);
-    uint8_t volToI2S(uint8_t volume);
     void stopInfo();
     void setOutputPins(bool isPlaying);
     void setResumeFilePos(uint32_t pos) { _resumeFilePos = pos; }

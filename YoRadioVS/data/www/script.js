@@ -143,20 +143,34 @@ function onMessage(event) {
         setupElement(key, data[key]);
       });
     }
-  }catch(e){
+  }catch(e)
+  {
     console.log("ws.onMessage error:", event.data);
+    console.log(e);
+    
   }
 }
 function escapeData(data){
-  let m=data.match(/{.+?:\s"(.+?)"}/);
-  if(m!==null){
-    let m1 = m[1];
-    if(m1.indexOf('"') !== -1){
-      let mq=m1.replace(/["]/g, '\\\"');
-      return data.replace(m1,mq);
+  // Fast attempt: if data is already valid JSON, return it unchanged
+  try {
+    JSON.parse(data);
+    return data;
+  } catch (e) {
+    // If parsing failed, try to escape raw control characters (LF/CR/TAB)
+    // inside all JSON string literals. This fixes cases where the server
+    // sends unescaped newlines inside quoted values.
+    try {
+      const fixed = data.replace(/"((?:\\.|[^"\\])*)"/gs, (match, content) => {
+        const replaced = content.replace(/\r/g, "\\r").replace(/\n/g, "\\n").replace(/\t/g, "\\t");
+        if (replaced === content) return match;
+        return `"${replaced}"`;
+      });
+      return fixed;
+    } catch (e2) {
+      // If anything goes wrong, return original data and let caller log the error
+      return data;
     }
   }
-  return data;
 }
 function getId(id,patent=document){
   return patent.getElementById(id);
@@ -191,6 +205,11 @@ function setupElement(id,value){
   const element = getId(id);
   if(id=="rssi"){ clearTimeout(pongtimeout); pingUp(); }
   if(element){
+    // support <select> elements
+    if(element.tagName === 'SELECT'){
+      element.value = value;
+      return;
+    }
     if(id=="heap"){
       element.style.width=`${value}%`;
       return;
@@ -216,7 +235,7 @@ function setupElement(id,value){
     }
   }
 }
-/***--- playlist ---***/
+///***--- playlist ---***///
 function setCurrentItem(item){
   currentItem=item;
   const playlist = getId("playlist");
@@ -243,19 +262,59 @@ function initPLEditor(){
 }
 function handlePlaylistData(fileData) {
   const ul = getId('playlist');
-  ul.innerHTML='';
-  if (!fileData) return;
-  const lines = fileData.split('\n');
-  let li='', html='';
-  for(var i = 0;i < lines.length;i++){
-    let line = lines[i].split('\t');
-    if(line.length==3){
-      const active=(i+1==currentItem)?' class="active"':'';
-      li=`<li${active} attr-id="${i+1}" class="play" data-name="${line[0].trim()}" data-url="${line[1].trim()}" data-ovol="${line[2].trim()}"><span class="text">${line[0].trim()}</span><span class="count">${i+1}</span></li>`;
-      html += li;
+  if(!ul) return;
+  // build HTML list
+  let html = '';
+  if (fileData) {
+    const lines = fileData.split('\n');
+    for(let i = 0;i < lines.length;i++){
+      let line = lines[i].split('\t');
+      if(line.length==3){
+        const active=(i+1==currentItem)?' class="active"':'';
+        html += `<li${active} attr-id="${i+1}" class="play" data-name="${line[0].trim()}" data-url="${line[1].trim()}" data-ovol="${line[2].trim()}"><span class="text">${line[0].trim()}</span><span class="count">${i+1}</span></li>`;
+      }
     }
   }
-  ul.innerHTML=html;
+
+  // insert search box (single, sibling before the playlist) if missing
+  const searchId = 'playlistSearch';
+  if(!getId(searchId)){
+    const parent = ul.parentNode || document.body;
+    const sdiv = document.createElement('div');
+    sdiv.style.display = 'flex';
+    sdiv.style.gap = '8px';
+    sdiv.style.margin = '8px 0';
+    sdiv.style.alignItems = 'center';
+    const input = document.createElement('input');
+    input.type = 'search'; input.id = searchId; input.placeholder = 'Search stations...';
+    input.style.width = '100%'; input.style.padding = '8px 10px'; input.style.borderRadius = '8px';
+    input.style.border = '1px solid rgba(255,255,255,0.06)'; input.style.background = 'rgba(255,255,255,0.02)';
+    input.style.color = 'var(--main-text-color)'; input.autocomplete = 'off';
+    sdiv.appendChild(input);
+    const clear = document.createElement('button'); clear.type='button'; clear.innerText='Clear';
+    clear.style.padding='8px 10px'; clear.style.borderRadius='8px'; clear.style.border='1px solid rgba(255,255,255,0.06)';
+    clear.style.background='transparent'; clear.style.color='var(--accent-color)';
+    clear.addEventListener('click', function(){ input.value=''; input.dispatchEvent(new Event('input')); input.focus(); });
+    sdiv.appendChild(clear);
+    parent.insertBefore(sdiv, ul);
+
+    // debounce helper
+    function debounce(func, wait){ let t; return function(...args){ clearTimeout(t); t = setTimeout(()=>func.apply(this,args), wait); }; }
+
+    function filterList(){
+      const q = input.value.trim().toLowerCase();
+      const items = ul.querySelectorAll('li');
+      if(!q){ items.forEach(it=>it.classList.remove('hidden')); return; }
+      items.forEach(it=>{
+        const name = (it.dataset && it.dataset.name) ? it.dataset.name.toLowerCase() : it.innerText.toLowerCase();
+        if(name.indexOf(q) !== -1) it.classList.remove('hidden'); else it.classList.add('hidden');
+      });
+    }
+    input.addEventListener('input', debounce(filterList, 180));
+  }
+
+  // set list content
+  ul.innerHTML = html;
   setCurrentItem(currentItem);
   if(!modesd) initPLEditor();
   bigplaylist = false;
@@ -636,6 +695,26 @@ function continueLoading(mode){
       event.preventDefault(); event.stopPropagation();
     }
   });
+  // Also handle 'change' events for controls that emit change (selects, etc.)
+  document.body.addEventListener('change', (event) => {
+    let target = event.target;
+    let command = target.dataset.command;
+    if (!command) {
+      if (target.parentElement) {
+        command = target.parentElement.dataset.command;
+        if (command) target = target.parentElement;
+      }
+    }
+    if (!command) return;
+    // ignore local-handled controls
+    if (target.classList.contains('local')) return;
+    if (target.type === 'range') {
+      sliderInput(target, command);
+    } else {
+      websocket.send(`${command}=${target.value}`);
+    }
+    event.preventDefault(); event.stopPropagation();
+  });
   document.body.addEventListener('mousewheel', (event) => {
     const target = event.target;
     if(target.type==='range'){
@@ -647,7 +726,7 @@ function continueLoading(mode){
     }
   });
 }
-/** UPDATE **/
+/** UPDATE **/ 
 var uploadWithError = false;
 function doUpdate(el) {
   let binfile = getId('binfile').files[0];

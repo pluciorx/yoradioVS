@@ -282,11 +282,14 @@ void Telnet::on_input(const char* str, uint8_t clientId) {
         printf(clientId, "##CLI.SCREENSAVER.PLAYING.BLANK#: %s\n> ", config.store.screensaverPlayingBlank ? "enabled" : "disabled");
         return;
     }
-	// Query screensaver animation type
-    if (strcmp(str, "cli.screensaver.lcdAnimationType") == 0 || strcmp(str, "screensaver.lcdAnimationType") == 0) {
-        printf(clientId, "##CLI.SCREENSAVER.LCDANIMATIONTYPE#: %s\n> ", config.store.lcdAnimationType );
+    // Query screensaver animation type
+    if (strcmp(str, "cli.lcdAnimationType") == 0 || strcmp(str, "lcdAnimationType") == 0) {
+        printf(clientId, "##CLI.lcdAnimationType#: %s (%d)\n> ",
+            animations[config.store.lcdAnimationType].animName, config.store.lcdAnimationType);
+
         return;
     }
+
     // Query all screensaver settings at once
     if (strcmp(str, "cli.screensaver.info") == 0 || strcmp(str, "screensaver.info") == 0) {
         printf(clientId, "##CLI.SCREENSAVER.INFO#\n");
@@ -301,21 +304,16 @@ void Telnet::on_input(const char* str, uint8_t clientId) {
 
 
     int animation;
-    if (sscanf(str, "lcdanimation(%d)", &animation) == 1 || sscanf(str, "cli.lcdanimation(\"%d\")", &animation) == 1 || sscanf(str, "lcdanimation %d", &animation) == 1) {
+    if (sscanf(str, "lcdanimationtype(%d)", &animation) == 1 || sscanf(str, "cli.lcdanimationtype(\"%d\")", &animation) == 1 || sscanf(str, "lcdanimationtype %d", &animation) == 1) {
 		animation = constrain(animation, 0, ANIM_TYPE_COUNT);
         config.setLcdAnimationType((uint8_t) animation);
-        printf(clientId, "##CLI.LCDANIMATION SET#: %s (%d)\n> ",
+        printf(clientId, "##CLI.LCDANIMATIONTYPE SET#: %s (%d)\n> ",
             animations[config.store.lcdAnimationType].animName, config.store.lcdAnimationType);
+       
         return;
     }
 
-
-    if (strcmp(str, "cli.lcdanimation") == 0 || strcmp(str, "lcdanimation") == 0) {        
-        printf(clientId, "##CLI.LCDANIMATION#: %s (%d)\n> ",
-            animations[config.store.lcdAnimationType].animName, config.store.lcdAnimationType);
-             
-        return;
-    }
+    
 
     if (strcmp(str, "sys.date") == 0 || strcmp(str, "date") == 0 || strcmp(str, "time") == 0) {
       network.requestTimeSync(true, clientId > MAX_TLN_CLIENTS?clientId:0);

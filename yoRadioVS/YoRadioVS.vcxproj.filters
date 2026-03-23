@@ -18,20 +18,20 @@
     <None Include="src\arduino folders read me.txt">
       <Filter>Misc Files</Filter>
     </None>
-    <None Include="src\AsyncWebServer\edit.htm" />
-    <None Include="data\www\dragpl.js.gz" />
-    <None Include="data\www\ir.css.gz" />
-    <None Include="data\www\ir.js.gz" />
-    <None Include="data\www\irrecord.html.gz" />
-    <None Include="data\www\logo.svg.gz" />
-    <None Include="data\www\options.html.gz" />
-    <None Include="data\www\player.html.gz" />
-    <None Include="data\www\script.js.gz" />
-    <None Include="data\www\style.css.gz" />
     <None Include="data\www\theme.css" />
-    <None Include="data\www\updform.html.gz" />
     <None Include="YoRadioVS.slnx" />
     <None Include=".github\copilot-instructions.md" />
+    <None Include="data\www\dragpl.js" />
+    <None Include="data\www\ir.css" />
+    <None Include="data\www\ir.js" />
+    <None Include="data\www\irrecord.html" />
+    <None Include="data\www\logo.svg" />
+    <None Include="data\www\options.html" />
+    <None Include="data\www\player.html" />
+    <None Include="data\www\script.js" />
+    <None Include="data\www\style.css" />
+    <None Include="data\www\updform.html" />
+    <None Include="data\www\bg.js" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="YoRadioVS.ino" />
@@ -536,6 +536,33 @@
     <ClCompile Include="src\displays\tools\utf8Pol.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\audioI2S\aac_decoder\libfaad\neaacdec.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audioI2S\opus_decoder\celt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audioI2S\opus_decoder\opus_decoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audioI2S\opus_decoder\range_decoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audioI2S\opus_decoder\silk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audioI2S\vorbis_decoder\vorbis_decoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\audioI2S\wav_decoder\wav_decoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MPR121Touch\src\MPR121Touch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\userdefine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.YoRadioVS.vsarduino.h">
@@ -734,9 +761,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\audioI2S\mp3_decoder\mp3_decoder.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\audioI2S\AudioEx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\audioVS1053\audioVS1053Ex.h">
@@ -1193,6 +1217,81 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\displays\tools\polishChars.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\aac_decoder\libfaad\defines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\aac_decoder\libfaad\neaacdec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\aac_decoder\libfaad\settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\aac_decoder\libfaad\structs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\aac_decoder\libfaad\tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\Audio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\audiolib_structs.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\mp3_decoder\structs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\mp3_decoder\tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\opus_decoder\celt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\opus_decoder\celt_defines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\opus_decoder\celt_structs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\opus_decoder\celt_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\opus_decoder\opus_decoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\opus_decoder\range_decoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\opus_decoder\silk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\opus_decoder\silk_defines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\opus_decoder\silk_structs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\opus_decoder\silk_tables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\psram_unique_ptr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\vorbis_decoder\lookup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\vorbis_decoder\vorbis_decoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audioI2S\wav_decoder\wav_decoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MPR121Touch\src\MPR121Touch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\userdefine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

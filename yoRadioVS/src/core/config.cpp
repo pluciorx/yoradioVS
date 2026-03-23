@@ -443,6 +443,9 @@ void Config::setScreensaverPlayingBlank(bool val){
 void Config::setLcdAnimationType(uint8_t val) {
     
     saveValue(&store.lcdAnimationType, val);
+#ifndef DSP_LCD
+    display.putRequest(NEWMODE, PLAYER);
+#endif
 }
 
 void Config::setSoundMeterEnabled(bool val) {
@@ -1041,6 +1044,7 @@ void Config::sleepForAfter(uint16_t sf, uint16_t sa){
 }
 
 void Config::bootInfo() {
+  BOOTLOG("");
   BOOTLOG("************************************************");
   BOOTLOG("*               ёPadio v%s                *", YOVERSION);
   BOOTLOG("************************************************");
@@ -1048,6 +1052,36 @@ void Config::bootInfo() {
   BOOTLOG("arduino:\t%d", ARDUINO);
   BOOTLOG("compiler:\t%s", __VERSION__);
   BOOTLOG("esp32core:\t%d.%d.%d", ESP_ARDUINO_VERSION_MAJOR, ESP_ARDUINO_VERSION_MINOR, ESP_ARDUINO_VERSION_PATCH);
+
+#ifdef CONFIG_LWIP_MAX_ACTIVE_TCP
+  BOOTLOG("CONFIG_LWIP_MAX_ACTIVE_TCP\t%d", CONFIG_LWIP_MAX_ACTIVE_TCP);
+#else
+  BOOTLOG("CONFIG_LWIP_MAX_ACTIVE_TCP\t<undef>");
+#endif
+
+#ifdef CONFIG_LWIP_MAX_LISTENING_TCP
+  BOOTLOG("CONFIG_LWIP_MAX_LISTENING_TCP\t%d", CONFIG_LWIP_MAX_LISTENING_TCP);
+#else
+  BOOTLOG("CONFIG_LWIP_MAX_LISTENING_TCP\t<undef>");
+#endif
+
+#ifdef CONFIG_LWIP_TCP_SND_BUF_DEFAULT
+  BOOTLOG("CONFIG_LWIP_TCP_SND_BUF_DEFAULT\t%d", CONFIG_LWIP_TCP_SND_BUF_DEFAULT);
+#else
+  BOOTLOG("CONFIG_LWIP_TCP_SND_BUF_DEFAULT\t<undef>");
+#endif
+
+#ifdef CONFIG_LWIP_TCP_WND_DEFAULT
+  BOOTLOG("CONFIG_LWIP_TCP_WND_DEFAULT\t%d", CONFIG_LWIP_TCP_WND_DEFAULT);
+#else
+  BOOTLOG("CONFIG_LWIP_TCP_WND_DEFAULT\t<undef>");
+#endif
+
+#ifdef CONFIG_LWIP_TCP_RECVMBOX_SIZE
+  BOOTLOG("CONFIG_LWIP_TCP_RECVMBOX_SIZE\t%d", CONFIG_LWIP_TCP_RECVMBOX_SIZE);
+#else
+  BOOTLOG("CONFIG_LWIP_TCP_RECVMBOX_SIZE\t<undef>");
+#endif
   uint32_t chipId = 0;
   for(int i=0; i<17; i=i+8) {
     chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
@@ -1071,6 +1105,7 @@ void Config::bootInfo() {
   BOOTLOG("encoders:\tl1=%d, b1=%d, r1=%d, pullup=%s, l2=%d, b2=%d, r2=%d, pullup=%s", 
           ENC_BTNL, ENC_BTNB, ENC_BTNR, ENC_INTERNALPULLUP?"true":"false", ENC2_BTNL, ENC2_BTNB, ENC2_BTNR, ENC2_INTERNALPULLUP?"true":"false");
   BOOTLOG("ir:\t\t%d", IR_PIN);
+  BOOTLOG("lcdanimationtype:\t\t%s", animations[store.lcdAnimationType].animName);
   if(SDC_CS!=255) BOOTLOG("SD:\t\t%d", SDC_CS);
   BOOTLOG("------------------------------------------------");
 }

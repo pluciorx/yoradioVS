@@ -33,10 +33,16 @@ input[type=text],input[type=password]{width:160px;background:rgba(255,255,255,.0
 input[type=text]:focus,input[type=password]:focus{border-color:rgba(227,210,95,.7);box-shadow:0 0 8px rgba(227,210,95,.2)}
 .wrap{display:flex;flex-direction:column;align-items:center;flex:1;padding:24px 0}
 </style>
-<script src="/variables.js"></script>
+<script type="text/javascript" src="/variables.js"></script>
 </head>
 <body>
-<canvas id="yobg"></canvas>
+<canvas id="yobg" style="position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;"></canvas>
 <div class="wrap">
 <section>
 <h2>&#1105;Radio &mdash; Web Uploader</h2>
@@ -71,7 +77,7 @@ document.wifiform.action='/'+formAction;
 if(playMode=='player')document.getElementById('wupload').classList.add('hidden');
 document.getElementById('version').innerHTML=' | v'+yoVersion;
 </script>
-<script src="/bg.js"></script>
+<script type="text/javascript" src="/bg.js?v=1.2.3"></script>
 </body></html>
 )rawhtml";
 const char index_html[] PROGMEM = R"(
@@ -91,11 +97,17 @@ const char index_html[] PROGMEM = R"(
   <script type="text/javascript" src="dragpl.js"></script>
 </head>
 <body>
-<canvas id="yobg"></canvas>
+<canvas id="yobg" style="position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;"></canvas>
 <div id="content" class="hidden progmem"></div>
 <div id="progress"><span id="loader"></span></div>
 <div id="heap"></div>
-<script src="bg.js"></script>
+<script type="text/javascript" src="bg.js"></script>
 </body>
 </html>
 )";

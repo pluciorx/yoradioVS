@@ -15,3 +15,9 @@
 --section-border:       #555555;
 --heapbar-color:        #3ea220;
 }
+
+/* ensure UI elements are above the canvas background */
+body > *:not(#yobg) {
+  position: relative;
+  z-index: 1;
+}

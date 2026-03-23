@@ -11,9 +11,12 @@
 //#include "core/mqtt.h"
 #include "core/optionschecker.h"
 #include "core/timekeeper.h"
+#include "userdefine.h"
 #ifdef USE_NEXTION
 #include "displays/nextion.h"
 #endif
+
+#include "MPR121Touch/src/MPR121Touch.h"
 
 #if USE_OTA
 #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
@@ -27,6 +30,8 @@
 #if DSP_HSPI || TS_HSPI || VS_HSPI
 SPIClass  SPI2(HSPI);
 #endif
+
+
 
 extern __attribute__((weak)) void yoradio_on_setup();
 void registerAudioCallbacks();    // <-- add this forward declaration
@@ -77,6 +82,7 @@ void setup() {
   config.init();
   display.init();
   player.init();
+  mpr121_setup();
   registerAudioCallbacks();   
   network.begin();
   if (network.status != CONNECTED && network.status!=SDREADY) {
@@ -117,6 +123,7 @@ void loop() {
 #endif
   }
   loopControls();
+  mpr121_loop();
   #ifdef NETSERVER_LOOP1
   netserver.loop();
   #endif
